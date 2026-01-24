@@ -1,4 +1,4 @@
-Comme je n'ai pas trouvé d'appli Andrpod avec un chrono inférieur à la minute. J'ai tout simplement demandé à Grok avec cette phrase.
+Comme je n'ai pas trouvé d'appli Android avec un chrono inférieur à la minute. J'ai tout simplement demandé à Grok avec cette phrase.
 On peut démarrer avec un index, un style.css et un script.js. Comme il s’agit d’un site à créer, Appelons le Alarme Répétitive par Asde Coeur. 
 Je veux une présentation RWD.
 On aura un curseur pour chaque unité de temps. Heure / Minute / Secondes
