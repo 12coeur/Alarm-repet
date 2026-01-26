@@ -5,6 +5,8 @@ let currentSeconds = 5;
 let isRunning = false;
 let cycles = 0;
 let selectedRingtone = 'sonnerie1.wav';
+let wakeLock = null;
+let wakeLockEnabled = true;
 let vibrateEnabled = true;
 
 // Éléments DOM
@@ -19,6 +21,8 @@ const startStopBtn = document.getElementById('startStopBtn');
 const resetBtn = document.getElementById('resetBtn');
 const ringtonesContainer = document.getElementById('ringtonesContainer');
 const alarmSound = document.getElementById('alarmSound');
+const wakeLockCheckbox = document.getElementById('wakeLock');
+const vibrateCheckbox = document.getElementById('vibrate');
 
 // Initialisation de l'application
 function initApp() {
@@ -36,6 +40,21 @@ function initApp() {
     
     // Mise à jour de l'année dans le footer
     document.getElementById('currentYear').textContent = new Date().getFullYear();
+    
+    // Vérification de la prise en charge de l'API Wake Lock
+    checkWakeLockSupport();
+}
+
+// Vérifie si l'API Wake Lock est supportée
+function checkWakeLockSupport() {
+    if ('wakeLock' in navigator) {
+        console.log('API Wake Lock supportée');
+        wakeLockCheckbox.disabled = false;
+    } else {
+        console.log('API Wake Lock non supportée');
+        wakeLockCheckbox.disabled = true;
+        wakeLockCheckbox.parentElement.innerHTML += ' <span class="unsupported">(Non supporté par votre navigateur)</span>';
+    }
 }
 
 // Met à jour le temps total à partir des curseurs
@@ -148,6 +167,11 @@ function startTimer() {
     startStopBtn.classList.remove('start-btn');
     startStopBtn.classList.add('stop-btn');
     
+    // Active le Wake Lock si activé
+    if (wakeLockEnabled && 'wakeLock' in navigator) {
+        requestWakeLock();
+    }
+    
     // Désactive les curseurs pendant l'exécution
     minutesSlider.disabled = true;
     secondsSlider.disabled = true;
@@ -169,6 +193,9 @@ function stopTimer() {
     startStopBtn.innerHTML = '<i class="fas fa-play"></i> Start';
     startStopBtn.classList.remove('stop-btn');
     startStopBtn.classList.add('start-btn');
+    
+    // Libère le Wake Lock
+    releaseWakeLock();
     
     // Réactive les curseurs
     minutesSlider.disabled = false;
@@ -256,6 +283,32 @@ function flashSuccess() {
     }, 500);
 }
 
+// Demande un Wake Lock pour empêcher la mise en veille
+async function requestWakeLock() {
+    try {
+        if (wakeLockEnabled && 'wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock activé');
+            
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock libéré');
+            });
+        }
+    } catch (err) {
+        console.error(`Erreur Wake Lock: ${err.name}, ${err.message}`);
+    }
+}
+
+// Libère le Wake Lock
+function releaseWakeLock() {
+    if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+            wakeLock = null;
+            console.log('Wake Lock libéré manuellement');
+        });
+    }
+}
+
 // Configure les écouteurs d'événements
 function setupEventListeners() {
     // Curseurs de minutes et secondes
@@ -268,12 +321,37 @@ function setupEventListeners() {
     // Bouton Reset
     resetBtn.addEventListener('click', resetTimer);
     
+    // Cases à cocher des paramètres
+    wakeLockCheckbox.addEventListener('change', function() {
+        wakeLockEnabled = this.checked;
+        
+        if (!wakeLockEnabled && wakeLock !== null) {
+            releaseWakeLock();
+        }
+        
+        if (wakeLockEnabled && isRunning && 'wakeLock' in navigator) {
+            requestWakeLock();
+        }
+    });
+    
+    vibrateCheckbox.addEventListener('change', function() {
+        vibrateEnabled = this.checked;
+    });
+    
     // Désactive le bouton Reset si le temps est à zéro
     minutesSlider.addEventListener('input', checkResetButton);
     secondsSlider.addEventListener('input', checkResetButton);
     
     // Vérifie l'état initial du bouton Reset
     checkResetButton();
+    
+    // Gestion de la visibilité de la page pour le Wake Lock
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && isRunning && wakeLockEnabled && 'wakeLock' in navigator) {
+            // Redemande le Wake Lock si la page redevient visible
+            requestWakeLock();
+        }
+    });
 }
 
 // Vérifie si le bouton Reset doit être désactivé
