@@ -28,7 +28,6 @@
                     <div class="progress-container">
                         <div class="progress-bar" id="progressBar"></div>
                     </div>
-                    <!-- SUPPRIMÉ: L'affichage des cycles ici -->
                 </div>
 
                 <div class="controls">
@@ -63,6 +62,22 @@
                     <h3>Sonneries disponibles</h3>
                     <div class="ringtones-grid" id="ringtonesContainer">
                         <!-- Les boutons de sonnerie seront générés par JavaScript -->
+                    </div>
+                </div>
+
+                <div class="settings">
+                    <h3>Paramètres</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="wakeLock" checked>
+                            <span class="setting-text">Empêcher la mise en veille pendant le minuteur</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="vibrate" checked>
+                            <span class="setting-text">Activer les vibrations</span>
+                        </label>
                     </div>
                 </div>
             </div>
