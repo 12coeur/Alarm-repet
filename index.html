@@ -5,55 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alarme Répétitive par Asde Coeur</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Images/logo.png" type="image/png">
 </head>
 <body>
     <div class="container">
-        <h1>Alarme Répétitive</h1>
-        <p>par Asde Coeur</p>
-
-        <!-- Affichage du temps restant -->
-        <div class="timer-display" id="timer">00:00:05</div>
-
-        <!-- Barre de progression -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progress"></div>
-        </div>
-
-        <!-- Réglages du temps -->
-        <div class="sliders">
-            <div class="slider-group">
-                <label>Heures</label>
-                <input type="range" id="hours" min="0" max="23" value="0">
-                <span id="hours-value">00</span>
+        <header>
+            <div class="logo-title">
+                <div class="logo-container">
+                    <img src="Images/logo.png" alt="Logo Alarme Répétitive" class="logo">
+                </div>
+                <h1>Alarme Répétitive</h1>
+                <p class="subtitle">par Asde Coeur</p>
             </div>
-            <div class="slider-group">
-                <label>Minutes</label>
-                <input type="range" id="minutes" min="0" max="59" value="0">
-                <span id="minutes-value">00</span>
-            </div>
-            <div class="slider-group">
-                <label>Secondes</label>
-                <input type="range" id="seconds" min="0" max="59" value="5">
-                <span id="seconds-value">05</span>
-            </div>
-        </div>
+            <p class="description">Un compte à rebours répétitif comme un sablier, avec alarme sonore.</p>
+        </header>
 
-        <!-- Sélection de la sonnerie -->
-        <div class="sounds">
-            <h2>Sonnerie</h2>
-            <div class="sound-buttons">
-                <button class="sound-btn active" data-sound="1">Sonnerie 1</button>
-                <button class="sound-btn" data-sound="2">Sonnerie 2</button>
-                <button class="sound-btn" data-sound="3">Sonnerie 3</button>
-                <button class="sound-btn" data-sound="4">Sonnerie 4</button>
-            </div>
-        </div>
+        <main>
+            <div class="timer-section">
+                <div class="timer-display">
+                    <div class="time-display" id="timeDisplay">00:05</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <!-- SUPPRIMÉ: L'affichage des cycles ici -->
+                </div>
 
-        <!-- Bouton Start / Stop -->
-        <button id="start-btn" class="big-btn">Start</button>
+                <div class="controls">
+                    <div class="time-selectors">
+                        <div class="time-selector">
+                            <label for="minutes">Minutes</label>
+                            <input type="range" id="minutes" min="0" max="60" value="0" class="slider">
+                            <span class="value-display" id="minutesValue">0</span>
+                        </div>
+                        <div class="time-selector">
+                            <label for="seconds">Secondes</label>
+                            <input type="range" id="seconds" min="0" max="60" value="5" class="slider">
+                            <span class="value-display" id="secondsValue">5</span>
+                        </div>
+                    </div>
+
+                    <div class="buttons-container">
+                        <button id="startStopBtn" class="btn start-btn">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <div class="cycle-counter-center">
+                            <div class="cycle-label-center">Cycles</div>
+                            <div class="cycle-number-center" id="cycleCountCenter">0</div>
+                        </div>
+                        <button id="resetBtn" class="btn reset-btn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ringtones">
+                    <h3>Sonneries disponibles</h3>
+                    <div class="ringtones-grid" id="ringtonesContainer">
+                        <!-- Les boutons de sonnerie seront générés par JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Alarme Répétitive &copy; <span id="currentYear"></span> - Application créée par Asde Coeur</p>
+            <p class="hint">L'application fonctionne comme un sablier: une fois le temps écoulé, le compte à rebours recommence automatiquement.</p>
+        </footer>
     </div>
 
-    <audio id="alarm-sound" preload="auto"></audio>
+    <audio id="alarmSound" preload="auto">
+        <source src="Sonneries/sonnerie1.wav" type="audio/wav">
+    </audio>
 
     <script src="script.js"></script>
 </body>
