@@ -2,25 +2,27 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Alarme Répétitive par Asde Coeur</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="Images/logo.png" type="image/png">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-	
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="logo-title">
+        <header class="compact-header">
+            <div class="header-top">
+                <h1 class="alarme-text">Alarme</h1>
+                
                 <div class="logo-container">
                     <img src="Images/logo.png" alt="Logo Alarme Répétitive" class="logo">
                 </div>
-                <h1>Alarme Répétitive</h1>
-                <p class="subtitle">par Asde Coeur</p>
+                
+                <div class="header-right">
+                    <h1 class="repetitive-text">Répétitive</h1>
+                    <p class="subtitle">par Asde Coeur</p>
+                </div>
             </div>
-            <p class="description">Un compte à rebours répétitif comme un sablier, avec alarme sonore.</p>
         </header>
 
         <main>
@@ -32,62 +34,62 @@
                     </div>
                 </div>
 
-                <div class="controls">
-                    <div class="time-selectors">
-                        <div class="time-selector">
-                            <label for="minutes">Minutes</label>
-                            <input type="range" id="minutes" min="0" max="60" value="0" class="slider">
-                            <span class="value-display" id="minutesValue">0</span>
-                        </div>
-                        <div class="time-selector">
-                            <label for="seconds">Secondes</label>
-                            <input type="range" id="seconds" min="0" max="60" value="5" class="slider">
-                            <span class="value-display" id="secondsValue">5</span>
-                        </div>
-                    </div>
-
-                    <div class="buttons-container">
+                <div class="controls-compact">
+                    <div class="main-controls">
                         <button id="startStopBtn" class="btn start-btn">
                             <i class="fas fa-play"></i> Start
                         </button>
-                        <div class="cycle-counter-center">
-                            <div class="cycle-label-center">Cycles</div>
+                        
+                        <div class="cycle-display">
                             <div class="cycle-number-center" id="cycleCountCenter">0</div>
                         </div>
+                        
                         <button id="resetBtn" class="btn reset-btn">
                             <i class="fas fa-redo"></i> Reset
                         </button>
                     </div>
+
+                    <div class="time-controls">
+                        <div class="time-selector-compact">
+                            <div class="time-label">Minutes</div>
+                            <input type="range" id="minutes" min="0" max="60" value="0" class="slider">
+                            <span class="value-display" id="minutesValue">0</span>
+                        </div>
+                        
+                        <div class="time-selector-compact">
+                            <div class="time-label">Secondes</div>
+                            <input type="range" id="seconds" min="0" max="60" value="5" class="slider">
+                            <span class="value-display" id="secondsValue">5</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="ringtones">
-                    <h3>Sonneries disponibles</h3>
+                <div class="ringtones-compact">
                     <div class="ringtones-grid" id="ringtonesContainer">
                         <!-- Les boutons de sonnerie seront générés par JavaScript -->
                     </div>
                 </div>
 
-                <div class="settings">
-                    <h3>Paramètres</h3>
+                <div class="settings-compact">
                     <div class="setting-item">
                         <label>
                             <input type="checkbox" id="wakeLock" checked>
-                            <span class="setting-text">Empêcher la mise en veille pendant le minuteur</span>
+                            <span class="setting-text">Empêcher la mise en veille</span>
                         </label>
                     </div>
                     <div class="setting-item">
                         <label>
                             <input type="checkbox" id="vibrate" checked>
-                            <span class="setting-text">Activer les vibrations</span>
+                            <span class="setting-text">Vibrations</span>
                         </label>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer>
-            <p>Alarme Répétitive &copy; <span id="currentYear"></span> - Application créée par Asde Coeur</p>
-            <p class="hint">L'application fonctionne comme un sablier: une fois le temps écoulé, le compte à rebours recommence automatiquement.</p>
+        <footer class="compact-footer">
+            <p>Alarme Répétitive &copy; <span id="currentYear"></span> - Asde Coeur</p>
+            <p class="hint">Compte à rebours répétitif comme un sablier</p>
         </footer>
     </div>
 
