@@ -9,3 +9,4 @@ La limite de temps atteinte la sonnerie par défaut sera lue (sonnerie1.wav). La
 En plus d’un affichage de décompte, je voudrais une barre de progression bien visible qui montre la partie du temps à répéter qui est en cours.
 Le fond d’écran est à agrandir « au carré disponible», se trouve dans Images et se nomme grok.png
 On met au point les fonctions puis je m’occuperai de l’esthétique.
+Suite à 15 modifications, redéplyement.
