@@ -1,371 +1,677 @@
-// Variables globales
-let timerInterval = null;
-let totalSeconds = 5; // Valeur par défaut: 5 secondes
-let currentSeconds = 5;
-let isRunning = false;
-let cycles = 0;
-let selectedRingtone = 'sonnerie1.wav';
-let wakeLock = null;
-let wakeLockEnabled = true;
-let vibrateEnabled = true;
-
-// Éléments DOM
-const timeDisplay = document.getElementById('timeDisplay');
-const progressBar = document.getElementById('progressBar');
-const cycleCountCenter = document.getElementById('cycleCountCenter');
-const minutesSlider = document.getElementById('minutes');
-const secondsSlider = document.getElementById('seconds');
-const minutesValue = document.getElementById('minutesValue');
-const secondsValue = document.getElementById('secondsValue');
-const startStopBtn = document.getElementById('startStopBtn');
-const resetBtn = document.getElementById('resetBtn');
-const ringtonesContainer = document.getElementById('ringtonesContainer');
-const alarmSound = document.getElementById('alarmSound');
-const wakeLockCheckbox = document.getElementById('wakeLock');
-const vibrateCheckbox = document.getElementById('vibrate');
-
-// Initialisation de l'application
-function initApp() {
-    // Mise à jour des valeurs des curseurs
-    updateTimeFromSliders();
-    
-    // Création des boutons de sonnerie
-    createRingtoneButtons();
-    
-    // Configuration des écouteurs d'événements
-    setupEventListeners();
-    
-    // Mise à jour de l'affichage initial
-    updateDisplay();
-    
-    // Mise à jour de l'année dans le footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-    
-    // Vérification de la prise en charge de l'API Wake Lock
-    checkWakeLockSupport();
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// Vérifie si l'API Wake Lock est supportée
-function checkWakeLockSupport() {
-    if ('wakeLock' in navigator) {
-        console.log('API Wake Lock supportée');
-        wakeLockCheckbox.disabled = false;
-    } else {
-        console.log('API Wake Lock non supportée');
-        wakeLockCheckbox.disabled = true;
-        wakeLockCheckbox.parentElement.innerHTML += ' <span class="unsupported">(Non supporté par votre navigateur)</span>';
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    transition: background 0.5s ease;
+    font-size: 14px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    background-color: rgba(20, 20, 40, 0.7); /* PLUS TRANSPARENT (0.7 au lieu de 0.9) */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid rgba(76, 201, 240, 0.2);
+}
+
+/* En-tête compact - Alarme - Logo - Répétitive sur une ligne */
+.compact-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(76, 201, 240, 0.4);
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.alarme-text {
+    font-size: 1.8rem;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+    font-weight: 700;
+}
+
+.logo-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #4cc9f0;
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
+    flex-shrink: 0;
+}
+
+.logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.header-right {
+    flex: 1;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.repetitive-text {
+    font-size: 1.8rem;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: #a9a9a9;
+    font-style: italic;
+}
+
+/* Affichage du minuteur */
+.timer-display {
+    background: rgba(10, 10, 25, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(67, 97, 238, 0.6); /* Bordure plus transparente */
+}
+
+.time-display {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #4cc9f0;
+    text-shadow: 0 0 20px rgba(76, 201, 240, 0.7);
+    margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+}
+
+.progress-container {
+    width: 100%;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.08); /* PLUS TRANSPARENT */
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); /* PLUS TRANSPARENT */
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+/* Contrôles compacts */
+.controls-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
+}
+
+.main-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    min-width: 90px;
+}
+
+.btn i {
+    font-size: 0.8rem;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9));
+    color: white;
+}
+
+.start-btn:hover {
+    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.stop-btn {
+    background: linear-gradient(135deg, rgba(247, 37, 133, 0.9), rgba(181, 23, 158, 0.9));
+    color: white;
+}
+
+.stop-btn:hover {
+    background: linear-gradient(135deg, rgba(181, 23, 158, 0.9), rgba(247, 37, 133, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, rgba(114, 9, 183, 0.9), rgba(86, 11, 173, 0.9));
+    color: white;
+}
+
+.reset-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(86, 11, 173, 0.9), rgba(114, 9, 183, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+}
+
+.cycle-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(67, 97, 238, 0.15); /* PLUS TRANSPARENT */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(67, 97, 238, 0.4);
+    min-width: 80px;
+    flex: 1;
+}
+
+.cycle-number-center {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.7);
+    font-family: 'Courier New', monospace;
+}
+
+/* Contrôles de temps */
+.time-controls {
+    display: flex;
+    gap: 15px;
+}
+
+.time-selector-compact {
+    flex: 1;
+}
+
+.time-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #a9a9a9;
+    font-weight: 600;
+    text-align: center;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    outline: none;
+    margin-bottom: 6px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4cc9f0;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4cc9f0;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
+}
+
+.value-display {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #4cc9f0;
+    background-color: rgba(76, 201, 240, 0.1);
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Sonneries compactes */
+.ringtones-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
+}
+
+.ringtones-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.ringtone-btn {
+    padding: 6px 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #a9a9a9;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-height: 50px;
+    justify-content: center;
+    text-align: center;
+}
+
+.ringtone-btn:hover {
+    background-color: rgba(76, 201, 240, 0.1);
+    color: #fff;
+    border-color: rgba(76, 201, 240, 0.3);
+}
+
+.ringtone-btn.active {
+    background-color: rgba(76, 201, 240, 0.2);
+    border-color: #4cc9f0;
+    color: #4cc9f0;
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+}
+
+.ringtone-btn i {
+    font-size: 1rem;
+}
+
+/* Paramètres compacts */
+.settings-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
+    display: flex;
+    gap: 10px;
+}
+
+.setting-item {
+    flex: 1;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.setting-item:hover {
+    background-color: rgba(76, 201, 240, 0.1);
+    border-color: rgba(76, 201, 240, 0.3);
+}
+
+.setting-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #d0d0d0;
+    width: 100%;
+}
+
+.setting-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+    accent-color: #4cc9f0;
+    flex-shrink: 0;
+}
+
+.setting-text {
+    flex-grow: 1;
+}
+
+.unsupported {
+    color: #f72585;
+    font-size: 0.7rem;
+    font-style: italic;
+    margin-left: 6px;
+    opacity: 0.8;
+}
+
+/* Pied de page compact */
+.compact-footer {
+    text-align: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a9a9a9;
+    font-size: 0.75rem;
+}
+
+.hint {
+    margin-top: 5px;
+    font-style: italic;
+    color: #888;
+    font-size: 0.7rem;
+}
+
+/* Responsive Design - Maintien de la transparence */
+@media (max-width: 768px) {
+    body {
+        padding: 6px;
+        font-size: 13px;
+    }
+    
+    .container {
+        padding: 10px;
+        max-width: 95%;
+        background-color: rgba(20, 20, 40, 0.7);
+    }
+    
+    .header-top {
+        gap: 8px;
+    }
+    
+    .alarme-text,
+    .repetitive-text {
+        font-size: 1.6rem;
+    }
+    
+    .logo-container {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .time-display {
+        font-size: 2.8rem;
+        margin-bottom: 12px;
+    }
+    
+    .timer-display {
+        background: rgba(10, 10, 25, 0.6);
+    }
+    
+    .controls-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    .ringtones-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    .settings-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    /* Le reste du responsive reste identique */
+    .main-controls {
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        min-width: 80px;
+    }
+    
+    .cycle-display {
+        padding: 8px 12px;
+        min-width: 70px;
+    }
+    
+    .cycle-number-center {
+        font-size: 1.8rem;
+    }
+    
+    .time-controls {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .ringtones-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
+    .settings-compact {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
-// Met à jour le temps total à partir des curseurs
-function updateTimeFromSliders() {
-    const minutes = parseInt(minutesSlider.value);
-    const seconds = parseInt(secondsSlider.value);
+@media (max-width: 480px) {
+    body {
+        padding: 4px;
+    }
     
-    totalSeconds = minutes * 60 + seconds;
-    currentSeconds = totalSeconds;
+    .container {
+        padding: 8px;
+        border-radius: 8px;
+        background-color: rgba(20, 20, 40, 0.7);
+    }
     
-    // Mise à jour des valeurs affichées
-    minutesValue.textContent = minutes;
-    secondsValue.textContent = seconds;
+    .alarme-text,
+    .repetitive-text {
+        font-size: 1.4rem;
+    }
     
-    updateDisplay();
-}
-
-// Met à jour l'affichage du minuteur
-function updateDisplay() {
-    const minutes = Math.floor(currentSeconds / 60);
-    const seconds = currentSeconds % 60;
+    .logo-container {
+        width: 45px;
+        height: 45px;
+    }
     
-    timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    .time-display {
+        font-size: 2.4rem;
+        letter-spacing: 1px;
+    }
     
-    // Mise à jour de la barre de progression
-    const progressPercentage = ((totalSeconds - currentSeconds) / totalSeconds) * 100;
-    progressBar.style.width = `${progressPercentage}%`;
+    .timer-display {
+        background: rgba(10, 10, 25, 0.6);
+    }
     
-    // Mise à jour du compteur de cycles (affichage central seulement)
-    cycleCountCenter.textContent = cycles;
+    .controls-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
     
-    // Animation verte pour les dernières secondes (réussite)
-    if (isRunning && currentSeconds <= 3 && currentSeconds > 0) {
-        timeDisplay.classList.add('success-active');
-    } else {
-        timeDisplay.classList.remove('success-active');
+    .ringtones-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    .settings-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    /* Le reste du responsive reste identique */
+    .main-controls {
+        gap: 6px;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 70px;
+    }
+    
+    .cycle-display {
+        padding: 6px 10px;
+        min-width: 60px;
+    }
+    
+    .cycle-number-center {
+        font-size: 1.6rem;
+    }
+    
+    .ringtones-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .ringtone-btn {
+        min-height: 45px;
+        padding: 5px 3px;
+        font-size: 0.7rem;
     }
 }
 
-// Crée les boutons de sélection des sonneries
-function createRingtoneButtons() {
-    const ringtones = [
-        { id: 1, name: 'Sonnerie 1', file: 'sonnerie1.wav', icon: 'bell' },
-        { id: 2, name: 'Sonnerie 2', file: 'sonnerie2.wav', icon: 'clock' },
-        { id: 3, name: 'Sonnerie 3', file: 'sonnerie3.wav', icon: 'music' },
-        { id: 4, name: 'Sonnerie 4', file: 'sonnerie4.wav', icon: 'volume-up' }
-    ];
+/* Version paysage (landscape) */
+@media (max-height: 600px) and (orientation: landscape) {
+    .container {
+        max-width: 90%;
+        background-color: rgba(20, 20, 40, 0.7);
+    }
     
-    ringtonesContainer.innerHTML = '';
+    .compact-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
     
-    ringtones.forEach(ringtone => {
-        const button = document.createElement('button');
-        button.className = `ringtone-btn ${ringtone.id === 1 ? 'active' : ''}`;
-        button.innerHTML = `<i class="fas fa-${ringtone.icon}"></i> ${ringtone.name}`;
-        
-        button.addEventListener('click', () => {
-            selectRingtone(ringtone.file, button);
-            playRingtonePreview(ringtone.file);
-        });
-        
-        ringtonesContainer.appendChild(button);
-    });
-}
-
-// Sélectionne une sonnerie
-function selectRingtone(ringtoneFile, button) {
-    // Retire la classe active de tous les boutons
-    document.querySelectorAll('.ringtone-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    .timer-display {
+        padding: 10px;
+        margin-bottom: 10px;
+        background: rgba(10, 10, 25, 0.6);
+    }
     
-    // Ajoute la classe active au bouton sélectionné
-    button.classList.add('active');
+    .time-display {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
     
-    // Met à jour la sonnerie sélectionnée
-    selectedRingtone = ringtoneFile;
+    .controls-compact, 
+    .ringtones-compact, 
+    .settings-compact {
+        padding: 10px;
+        margin-bottom: 10px;
+        background: rgba(15, 15, 35, 0.6);
+    }
     
-    // Met à jour la source audio
-    alarmSound.src = `Sonneries/${ringtoneFile}`;
-    alarmSound.load();
-}
-
-// Joue un aperçu de la sonnerie
-function playRingtonePreview(ringtoneFile) {
-    if (isRunning) return; // Ne pas jouer d'aperçu pendant le décompte
+    .main-controls {
+        margin-bottom: 10px;
+    }
     
-    const previewAudio = new Audio(`Sonneries/${ringtoneFile}`);
-    previewAudio.volume = 0.5;
-    previewAudio.play().catch(e => console.log("Impossible de jouer l'aperçu audio:", e));
-}
-
-// Démarre ou arrête le minuteur
-function toggleTimer() {
-    if (isRunning) {
-        stopTimer();
-    } else {
-        startTimer();
+    .compact-footer {
+        margin-top: 8px;
+        padding-top: 8px;
     }
 }
 
-// Démarre le minuteur
-function startTimer() {
-    if (isRunning) return;
-    
-    // Met à jour le temps total à partir des curseurs
-    updateTimeFromSliders();
-    
-    isRunning = true;
-    startStopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop';
-    startStopBtn.classList.remove('start-btn');
-    startStopBtn.classList.add('stop-btn');
-    
-    // Active le Wake Lock si activé
-    if (wakeLockEnabled && 'wakeLock' in navigator) {
-        requestWakeLock();
+/* Animation pour la réussite (verte) - BIEN VISIBLE grâce à la transparence */
+@keyframes success-pulse {
+    0% { 
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        color: #4cc9f0;
     }
-    
-    // Désactive les curseurs pendant l'exécution
-    minutesSlider.disabled = true;
-    secondsSlider.disabled = true;
-    
-    // Active le bouton Reset
-    resetBtn.disabled = false;
-    
-    // Démarre l'intervalle du minuteur
-    timerInterval = setInterval(updateTimer, 1000);
-}
-
-// Arrête le minuteur
-function stopTimer() {
-    if (!isRunning) return;
-    
-    isRunning = false;
-    clearInterval(timerInterval);
-    
-    startStopBtn.innerHTML = '<i class="fas fa-play"></i> Start';
-    startStopBtn.classList.remove('stop-btn');
-    startStopBtn.classList.add('start-btn');
-    
-    // Libère le Wake Lock
-    releaseWakeLock();
-    
-    // Réactive les curseurs
-    minutesSlider.disabled = false;
-    secondsSlider.disabled = false;
-    
-    // Arrête le son d'alarme s'il est en cours
-    alarmSound.pause();
-    alarmSound.currentTime = 0;
-    
-    // Retire l'animation de réussite
-    timeDisplay.classList.remove('success-active');
-}
-
-// Réinitialise le minuteur
-function resetTimer() {
-    // Arrête le minuteur s'il est en cours
-    if (isRunning) {
-        stopTimer();
+    50% { 
+        text-shadow: 0 0 30px rgba(76, 175, 80, 1);
+        color: #4CAF50;
     }
-    
-    // Réinitialise les cycles
-    cycles = 0;
-    
-    // Réinitialise le minuteur à la valeur des curseurs
-    updateTimeFromSliders();
-    
-    // Désactive le bouton Reset si le minuteur est à zéro
-    if (totalSeconds === 0) {
-        resetBtn.disabled = true;
-    }
-    
-    // Retire l'animation de réussite
-    timeDisplay.classList.remove('success-active');
-}
-
-// Met à jour le minuteur chaque seconde
-function updateTimer() {
-    currentSeconds--;
-    
-    if (currentSeconds <= 0) {
-        // Temps écoulé - SUCCÈS !
-        currentSeconds = 0;
-        updateDisplay();
-        
-        // Déclenche l'alarme de réussite
-        triggerSuccess();
-        
-        // Incrémente le compteur de cycles
-        cycles++;
-        
-        // Réinitialise le minuteur pour le cycle suivant
-        setTimeout(() => {
-            currentSeconds = totalSeconds;
-            updateDisplay();
-        }, 100);
-        
-        return;
-    }
-    
-    updateDisplay();
-}
-
-// Déclenche l'effet de réussite (remplace l'alarme)
-function triggerSuccess() {
-    // Joue la sonnerie (mais avec une signification positive)
-    alarmSound.currentTime = 0;
-    alarmSound.play().catch(e => console.log("Impossible de jouer le son de réussite:", e));
-    
-    // Active la vibration si disponible et activée
-    if (vibrateEnabled && 'vibrate' in navigator) {
-        navigator.vibrate([300, 100, 300]); // Vibration plus douce
-    }
-    
-    // Effet visuel de réussite (vert)
-    flashSuccess();
-}
-
-// Fait clignoter l'écran en vert pour la réussite
-function flashSuccess() {
-    // Ajoute une classe au body pour l'animation
-    document.body.classList.add('success-flash');
-    
-    // Retire la classe après l'animation
-    setTimeout(() => {
-        document.body.classList.remove('success-flash');
-    }, 500);
-}
-
-// Demande un Wake Lock pour empêcher la mise en veille
-async function requestWakeLock() {
-    try {
-        if (wakeLockEnabled && 'wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Wake Lock activé');
-            
-            wakeLock.addEventListener('release', () => {
-                console.log('Wake Lock libéré');
-            });
-        }
-    } catch (err) {
-        console.error(`Erreur Wake Lock: ${err.name}, ${err.message}`);
+    100% { 
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        color: #4cc9f0;
     }
 }
 
-// Libère le Wake Lock
-function releaseWakeLock() {
-    if (wakeLock !== null) {
-        wakeLock.release().then(() => {
-            wakeLock = null;
-            console.log('Wake Lock libéré manuellement');
-        });
+@keyframes success-glow {
+    0% { 
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(67, 97, 238, 0.6);
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(76, 175, 80, 0.8);
+    }
+    100% { 
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(67, 97, 238, 0.6);
     }
 }
 
-// Configure les écouteurs d'événements
-function setupEventListeners() {
-    // Curseurs de minutes et secondes
-    minutesSlider.addEventListener('input', updateTimeFromSliders);
-    secondsSlider.addEventListener('input', updateTimeFromSliders);
-    
-    // Bouton Start/Stop
-    startStopBtn.addEventListener('click', toggleTimer);
-    
-    // Bouton Reset
-    resetBtn.addEventListener('click', resetTimer);
-    
-    // Cases à cocher des paramètres
-    wakeLockCheckbox.addEventListener('change', function() {
-        wakeLockEnabled = this.checked;
-        
-        if (!wakeLockEnabled && wakeLock !== null) {
-            releaseWakeLock();
-        }
-        
-        if (wakeLockEnabled && isRunning && 'wakeLock' in navigator) {
-            requestWakeLock();
-        }
-    });
-    
-    vibrateCheckbox.addEventListener('change', function() {
-        vibrateEnabled = this.checked;
-    });
-    
-    // Désactive le bouton Reset si le temps est à zéro
-    minutesSlider.addEventListener('input', checkResetButton);
-    secondsSlider.addEventListener('input', checkResetButton);
-    
-    // Vérifie l'état initial du bouton Reset
-    checkResetButton();
-    
-    // Gestion de la visibilité de la page pour le Wake Lock
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && isRunning && wakeLockEnabled && 'wakeLock' in navigator) {
-            // Redemande le Wake Lock si la page redevient visible
-            requestWakeLock();
-        }
-    });
+@keyframes progress-success {
+    0% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
+    50% { background: linear-gradient(90deg, rgba(76, 175, 80, 0.9), rgba(46, 125, 50, 0.9)); }
+    100% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
 }
 
-// Vérifie si le bouton Reset doit être désactivé
-function checkResetButton() {
-    const minutes = parseInt(minutesSlider.value);
-    const seconds = parseInt(secondsSlider.value);
-    
-    if (minutes === 0 && seconds === 0) {
-        resetBtn.disabled = true;
-    } else {
-        resetBtn.disabled = false;
-    }
+.success-active {
+    animation: success-pulse 1s infinite;
 }
 
-// Initialise l'application lorsque le DOM est chargé
-document.addEventListener('DOMContentLoaded', initApp);
+.success-active ~ .progress-container {
+    animation: success-glow 1s infinite;
+}
+
+.success-active ~ .progress-container .progress-bar {
+    animation: progress-success 1s infinite;
+}
+
+/* Effet de fond BIEN VISIBLE grâce à la transparence */
+body.success-flash {
+    animation: body-flash 0.5s ease;
+}
+
+@keyframes body-flash {
+    0% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
+    50% { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); }
+    100% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
+}
