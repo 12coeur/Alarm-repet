@@ -1,681 +1,102 @@
-/* Version compacte Commitée */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px;
-    transition: background 0.5s ease;
-    font-size: 14px;
-}
-
-.container {
-    width: 100%;
-    max-width: 500px;
-    background-color: rgba(20, 20, 40, 0.7); /* PLUS TRANSPARENT (0.7 au lieu de 0.9) */
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-    padding: 12px;
-    margin: 8px 0;
-    border: 1px solid rgba(76, 201, 240, 0.2);
-}
-
-/* En-tête compact - Alarme - Logo - Répétitive sur une ligne */
-.compact-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(76, 201, 240, 0.4);
-}
-
-
-.header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.alarme-text {
-    font-size: 1.8rem;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
-    flex: 1;
-    text-align: right;
-    margin-right: 10px;
-    font-weight: 700;
-}
-
-.logo-container {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid #4cc9f0;
-    box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
-    flex-shrink: 0;
-}
-
-.logo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.header-right {
-    flex: 1;
-    text-align: left;
-    margin-left: 10px;
-}
-
-.repetitive-text {
-    font-size: 1.8rem;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
-    margin-bottom: 2px;
-    font-weight: 700;
-}
-
-.subtitle {
-    font-size: 0.9rem;
-    color: #a9a9a9;
-    font-style: italic;
-}
-
-/* Affichage du minuteur */
-.timer-display {
-    background: rgba(10, 10, 25, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    text-align: center;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(67, 97, 238, 0.6); /* Bordure plus transparente */
-}
-
-.time-display {
-    font-size: 3.2rem;
-    font-weight: 700;
-    color: #4cc9f0;
-    text-shadow: 0 0 20px rgba(76, 201, 240, 0.7);
-    margin-bottom: 15px;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 2px;
-    transition: all 0.3s ease;
-}
-
-.progress-container {
-    width: 100%;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.08); /* PLUS TRANSPARENT */
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); /* PLUS TRANSPARENT */
-    width: 0%;
-    border-radius: 6px;
-    transition: width 0.3s ease;
-}
-
-/* Contrôles compacts */
-.controls-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(67, 97, 238, 0.4);
-}
-
-.main-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.btn {
-    padding: 10px 15px;
-    font-size: 0.95rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    min-width: 90px;
-}
-
-.btn i {
-    font-size: 0.8rem;
-}
-
-.start-btn {
-    background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9));
-    color: white;
-}
-
-.start-btn:hover {
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
-.stop-btn {
-    background: linear-gradient(135deg, rgba(247, 37, 133, 0.9), rgba(181, 23, 158, 0.9));
-    color: white;
-}
-
-.stop-btn:hover {
-    background: linear-gradient(135deg, rgba(181, 23, 158, 0.9), rgba(247, 37, 133, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
-.reset-btn {
-    background: linear-gradient(135deg, rgba(114, 9, 183, 0.9), rgba(86, 11, 173, 0.9));
-    color: white;
-}
-
-.reset-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, rgba(86, 11, 173, 0.9), rgba(114, 9, 183, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
-.reset-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
-}
-
-.cycle-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(67, 97, 238, 0.15); /* PLUS TRANSPARENT */
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(67, 97, 238, 0.4);
-    min-width: 80px;
-    flex: 1;
-}
-
-.cycle-number-center {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.7);
-    font-family: 'Courier New', monospace;
-}
-
-/* Contrôles de temps */
-.time-controls {
-    display: flex;
-    gap: 15px;
-}
-
-.time-selector-compact {
-    flex: 1;
-}
-
-.time-label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-    color: #a9a9a9;
-    font-weight: 600;
-    text-align: center;
-}
-
-.slider {
-    width: 100%;
-    height: 8px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    outline: none;
-    margin-bottom: 6px;
-}
-
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #4cc9f0;
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
-}
-
-.slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #4cc9f0;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
-}
-
-.value-display {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #4cc9f0;
-    background-color: rgba(76, 201, 240, 0.1);
-    padding: 3px 10px;
-    border-radius: 6px;
-    text-align: center;
-    width: 100%;
-}
-
-/* Sonneries compactes */
-.ringtones-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(67, 97, 238, 0.4);
-}
-
-.ringtones-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-}
-
-.ringtone-btn {
-    padding: 6px 4px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: #a9a9a9;
-    cursor: pointer;
-    font-size: 0.75rem;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    min-height: 50px;
-    justify-content: center;
-    text-align: center;
-}
-
-.ringtone-btn:hover {
-    background-color: rgba(76, 201, 240, 0.1);
-    color: #fff;
-    border-color: rgba(76, 201, 240, 0.3);
-}
-
-.ringtone-btn.active {
-    background-color: rgba(76, 201, 240, 0.2);
-    border-color: #4cc9f0;
-    color: #4cc9f0;
-    box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
-}
-
-.ringtone-btn i {
-    font-size: 1rem;
-}
-
-/* Paramètres compacts */
-.settings-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(67, 97, 238, 0.4);
-    display: flex;
-    gap: 10px;
-}
-
-.setting-item {
-    flex: 1;
-    padding: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.setting-item:hover {
-    background-color: rgba(76, 201, 240, 0.1);
-    border-color: rgba(76, 201, 240, 0.3);
-}
-
-.setting-item label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: #d0d0d0;
-    width: 100%;
-}
-
-.setting-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #4cc9f0;
-    flex-shrink: 0;
-}
-
-.setting-text {
-    flex-grow: 1;
-}
-
-.unsupported {
-    color: #f72585;
-    font-size: 0.7rem;
-    font-style: italic;
-    margin-left: 6px;
-    opacity: 0.8;
-}
-
-/* Pied de page compact */
-.compact-footer {
-    text-align: center;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: #a9a9a9;
-    font-size: 0.75rem;
-}
-
-.hint {
-    margin-top: 5px;
-    font-style: italic;
-    color: #888;
-    font-size: 0.7rem;
-}
-
-/* Responsive Design - Maintien de la transparence */
-@media (max-width: 768px) {
-    body {
-        padding: 6px;
-        font-size: 13px;
-    }
-    
-    .container {
-        padding: 10px;
-        max-width: 95%;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .header-top {
-        gap: 8px;
-    }
-    
-    .alarme-text,
-    .repetitive-text {
-        font-size: 1.6rem;
-    }
-    
-    .logo-container {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .time-display {
-        font-size: 2.8rem;
-        margin-bottom: 12px;
-    }
-    
-    .timer-display {
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .controls-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .ringtones-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .settings-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    /* Le reste du responsive reste identique */
-    .main-controls {
-        flex-direction: row;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-        min-width: 80px;
-    }
-    
-    .cycle-display {
-        padding: 8px 12px;
-        min-width: 70px;
-    }
-    
-    .cycle-number-center {
-        font-size: 1.8rem;
-    }
-    
-    .time-controls {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .ringtones-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-    
-    .settings-compact {
-        flex-direction: column;
-        gap: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 4px;
-    }
-    
-    .container {
-        padding: 8px;
-        border-radius: 8px;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .alarme-text,
-    .repetitive-text {
-        font-size: 1.4rem;
-    }
-    
-    .logo-container {
-        width: 45px;
-        height: 45px;
-    }
-    
-    .time-display {
-        font-size: 2.4rem;
-        letter-spacing: 1px;
-    }
-    
-    .timer-display {
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .controls-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .ringtones-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .settings-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    /* Le reste du responsive reste identique */
-    .main-controls {
-        gap: 6px;
-    }
-    
-    .btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        min-width: 70px;
-    }
-    
-    .cycle-display {
-        padding: 6px 10px;
-        min-width: 60px;
-    }
-    
-    .cycle-number-center {
-        font-size: 1.6rem;
-    }
-    
-    .ringtones-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .ringtone-btn {
-        min-height: 45px;
-        padding: 5px 3px;
-        font-size: 0.7rem;
-    }
-}
-
-/* Version paysage (landscape) */
-@media (max-height: 600px) and (orientation: landscape) {
-    .container {
-        max-width: 90%;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .compact-header {
-        margin-bottom: 10px;
-        padding-bottom: 8px;
-    }
-    
-    .timer-display {
-        padding: 10px;
-        margin-bottom: 10px;
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .time-display {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-    
-    .controls-compact, 
-    .ringtones-compact, 
-    .settings-compact {
-        padding: 10px;
-        margin-bottom: 10px;
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .main-controls {
-        margin-bottom: 10px;
-    }
-    
-    .compact-footer {
-        margin-top: 8px;
-        padding-top: 8px;
-    }
-}
-
-/* Animation pour la réussite (verte) - BIEN VISIBLE grâce à la transparence */
-@keyframes success-pulse {
-    0% { 
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
-        color: #4cc9f0;
-    }
-    50% { 
-        text-shadow: 0 0 30px rgba(76, 175, 80, 1);
-        color: #4CAF50;
-    }
-    100% { 
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
-        color: #4cc9f0;
-    }
-}
-
-@keyframes success-glow {
-    0% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(67, 97, 238, 0.6);
-    }
-    50% { 
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(76, 175, 80, 0.8);
-    }
-    100% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(67, 97, 238, 0.6);
-    }
-}
-
-@keyframes progress-success {
-    0% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
-    50% { background: linear-gradient(90deg, rgba(76, 175, 80, 0.9), rgba(46, 125, 50, 0.9)); }
-    100% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
-}
-
-.success-active {
-    animation: success-pulse 1s infinite;
-}
-
-.success-active ~ .progress-container {
-    animation: success-glow 1s infinite;
-}
-
-.success-active ~ .progress-container .progress-bar {
-    animation: progress-success 1s infinite;
-}
-
-/* Effet de fond BIEN VISIBLE grâce à la transparence */
-body.success-flash {
-    animation: body-flash 0.5s ease;
-}
-
-@keyframes body-flash {
-    0% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
-    50% { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); }
-    100% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
-}
-
-
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Alarme Répétitive par Asde Coeur</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Images/logo.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <header class="compact-header">
+            <div class="header-top">
+                <h1 class="alarme-text">Alarme</h1>
+                
+                <div class="logo-container">
+                    <img src="Images/logo.png" alt="Logo Alarme Répétitive" class="logo">
+                </div>
+                
+                <div class="header-right">
+                    <h1 class="repetitive-text">Répétitive</h1>
+                    <p class="subtitle">par Asde Coeur</p>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="timer-section">
+                <div class="timer-display">
+                    <div class="time-display" id="timeDisplay">00:05</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div class="controls-compact">
+                    <div class="main-controls">
+                        <button id="startStopBtn" class="btn start-btn">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        
+                        <div class="cycle-display">
+                            <div class="cycle-number-center" id="cycleCountCenter">0</div>
+                        </div>
+                        
+                        <button id="resetBtn" class="btn reset-btn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+
+                    <div class="time-controls">
+                        <div class="time-selector-compact">
+                            <div class="time-label">Minutes</div>
+                            <input type="range" id="minutes" min="0" max="60" value="0" class="slider">
+                            <span class="value-display" id="minutesValue">0</span>
+                        </div>
+                        
+                        <div class="time-selector-compact">
+                            <div class="time-label">Secondes</div>
+                            <input type="range" id="seconds" min="0" max="60" value="5" class="slider">
+                            <span class="value-display" id="secondsValue">5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ringtones-compact">
+                    <div class="ringtones-grid" id="ringtonesContainer">
+                        <!-- Les boutons de sonnerie seront générés par JavaScript -->
+                    </div>
+                </div>
+
+                <div class="settings-compact">
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="wakeLock" checked>
+                            <span class="setting-text">Empêcher la mise en veille</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="vibrate" checked>
+                            <span class="setting-text">Vibrations</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="compact-footer">
+            <p>Alarme Répétitive &copy; <span id="currentYear"></span> - Asde Coeur</p>
+            <p class="hint">Compte à rebours répétitif comme un sablier</p>
+        </footer>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="Sonneries/sonnerie1.wav" type="audio/wav">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
