@@ -275,11 +275,12 @@ function triggerSuccess() {
 
 // Fait clignoter l'écran en vert pour la réussite
 function flashSuccess() {
-    const originalBg = document.body.style.background;
-    document.body.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)';
+    // Ajoute une classe au body pour l'animation
+    document.body.classList.add('success-flash');
     
+    // Retire la classe après l'animation
     setTimeout(() => {
-        document.body.style.background = originalBg;
+        document.body.classList.remove('success-flash');
     }, 500);
 }
 
