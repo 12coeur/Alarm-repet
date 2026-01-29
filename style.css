@@ -7,50 +7,60 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
     color: #fff;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    padding: 8px;
     transition: background 0.5s ease;
-    font-size: 14px; /* Taille de police de base réduite */
+    font-size: 14px;
 }
 
 .container {
     width: 100%;
-    max-width: 500px; /* Réduit la largeur max */
-    background-color: rgba(30, 30, 46, 0.85);
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    padding: 15px;
-    margin: 10px 0;
+    max-width: 500px;
+    background-color: rgba(20, 20, 40, 0.7); /* PLUS TRANSPARENT (0.7 au lieu de 0.9) */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid rgba(76, 201, 240, 0.2);
 }
 
-/* En-tête */
-header {
-    text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #4cc9f0;
+/* En-tête compact - Alarme - Logo - Répétitive sur une ligne */
+.compact-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(76, 201, 240, 0.4);
 }
 
-.logo-title {
+.header-top {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.alarme-text {
+    font-size: 1.8rem;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+    font-weight: 700;
 }
 
 .logo-container {
-    width: 80px; /* Réduit */
-    height: 80px; /* Réduit */
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid #4cc9f0;
-    margin-bottom: 10px;
-    box-shadow: 0 3px 10px rgba(76, 201, 240, 0.4);
+    border: 2px solid #4cc9f0;
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
+    flex-shrink: 0;
 }
 
 .logo {
@@ -59,112 +69,197 @@ header {
     object-fit: cover;
 }
 
-h1 {
-    font-size: 1.8rem; /* Réduit */
+.header-right {
+    flex: 1;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.repetitive-text {
+    font-size: 1.8rem;
     color: #4cc9f0;
-    margin-bottom: 5px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+    margin-bottom: 2px;
+    font-weight: 700;
 }
 
 .subtitle {
-    font-size: 1rem; /* Réduit */
+    font-size: 0.9rem;
     color: #a9a9a9;
     font-style: italic;
 }
 
-.description {
-    font-size: 0.95rem; /* Réduit */
-    color: #d0d0d0;
-    max-width: 400px;
-    margin: 0 auto;
-    line-height: 1.4;
-}
-
 /* Affichage du minuteur */
 .timer-display {
-    background: rgba(10, 10, 20, 0.8);
-    border-radius: 12px;
-    padding: 20px; /* Réduit */
-    margin-bottom: 20px;
+    background: rgba(10, 10, 25, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
     text-align: center;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-    border: 2px solid #4361ee;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(67, 97, 238, 0.6); /* Bordure plus transparente */
 }
 
 .time-display {
-    font-size: 3.5rem; /* Réduit */
+    font-size: 3.2rem;
     font-weight: 700;
     color: #4cc9f0;
-    text-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
-    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(76, 201, 240, 0.7);
+    margin-bottom: 15px;
     font-family: 'Courier New', monospace;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     transition: all 0.3s ease;
 }
 
 .progress-container {
     width: 100%;
-    height: 18px; /* Réduit */
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 9px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.08); /* PLUS TRANSPARENT */
+    border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #4361ee, #4cc9f0);
+    background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); /* PLUS TRANSPARENT */
     width: 0%;
-    border-radius: 9px;
+    border-radius: 6px;
     transition: width 0.3s ease;
 }
 
-/* Contrôles */
-.controls {
-    background: rgba(20, 20, 40, 0.7);
-    border-radius: 12px;
-    padding: 20px; /* Réduit */
-    margin-bottom: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+/* Contrôles compacts */
+.controls-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
 }
 
-.time-selectors {
+.main-controls {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.time-selector {
+.btn {
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    min-width: 90px;
+}
+
+.btn i {
+    font-size: 0.8rem;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9));
+    color: white;
+}
+
+.start-btn:hover {
+    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.stop-btn {
+    background: linear-gradient(135deg, rgba(247, 37, 133, 0.9), rgba(181, 23, 158, 0.9));
+    color: white;
+}
+
+.stop-btn:hover {
+    background: linear-gradient(135deg, rgba(181, 23, 158, 0.9), rgba(247, 37, 133, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, rgba(114, 9, 183, 0.9), rgba(86, 11, 173, 0.9));
+    color: white;
+}
+
+.reset-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(86, 11, 173, 0.9), rgba(114, 9, 183, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+}
+
+.cycle-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(67, 97, 238, 0.15); /* PLUS TRANSPARENT */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(67, 97, 238, 0.4);
+    min-width: 80px;
     flex: 1;
-    min-width: 120px; /* Réduit */
 }
 
-.time-selector label {
+.cycle-number-center {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px rgba(76, 201, 240, 0.7);
+    font-family: 'Courier New', monospace;
+}
+
+/* Contrôles de temps */
+.time-controls {
+    display: flex;
+    gap: 15px;
+}
+
+.time-selector-compact {
+    flex: 1;
+}
+
+.time-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 1rem; /* Réduit */
+    margin-bottom: 6px;
+    font-size: 0.9rem;
     color: #a9a9a9;
     font-weight: 600;
+    text-align: center;
 }
 
 .slider {
     width: 100%;
-    height: 10px; /* Réduit */
+    height: 8px;
     -webkit-appearance: none;
     appearance: none;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    border-radius: 4px;
     outline: none;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 22px; /* Réduit */
-    height: 22px; /* Réduit */
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #4cc9f0;
     cursor: pointer;
@@ -172,8 +267,8 @@ h1 {
 }
 
 .slider::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #4cc9f0;
     cursor: pointer;
@@ -182,155 +277,47 @@ h1 {
 }
 
 .value-display {
-    display: inline-block;
-    font-size: 1.2rem; /* Réduit */
+    display: block;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #4cc9f0;
     background-color: rgba(76, 201, 240, 0.1);
-    padding: 4px 12px;
-    border-radius: 8px;
-    min-width: 50px;
+    padding: 3px 10px;
+    border-radius: 6px;
     text-align: center;
+    width: 100%;
 }
 
-.buttons-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px; /* Réduit */
-}
-
-.btn {
-    padding: 12px 20px; /* Réduit */
-    font-size: 1rem; /* Réduit */
-    font-weight: bold;
-    border: none;
+/* Sonneries compactes */
+.ringtones-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
     border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    min-width: 100px; /* Réduit */
-}
-
-.btn i {
-    font-size: 0.9rem; /* Réduit */
-}
-
-.start-btn {
-    background: linear-gradient(135deg, #4361ee, #3a0ca3);
-    color: white;
-}
-
-.start-btn:hover {
-    background: linear-gradient(135deg, #3a0ca3, #4361ee);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-.start-btn:active {
-    transform: translateY(0);
-}
-
-.stop-btn {
-    background: linear-gradient(135deg, #f72585, #b5179e);
-    color: white;
-}
-
-.stop-btn:hover {
-    background: linear-gradient(135deg, #b5179e, #f72585);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-.reset-btn {
-    background: linear-gradient(135deg, #7209b7, #560bad);
-    color: white;
-}
-
-.reset-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #560bad, #7209b7);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-.reset-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: linear-gradient(135deg, #3a0ca3, #4361ee);
-}
-
-.cycle-counter-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(67, 97, 238, 0.15);
-    padding: 15px 20px; /* Réduit */
-    border-radius: 12px;
-    border: 2px solid #4361ee;
-    min-width: 130px; /* Réduit */
-    flex: 1;
-    max-width: 180px; /* Réduit */
-}
-
-.cycle-label-center {
-    font-size: 1.1rem; /* Réduit */
-    color: #a9a9a9;
-    margin-bottom: 3px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-}
-
-.cycle-number-center {
-    font-size: 2.5rem; /* Réduit */
-    font-weight: bold;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.7);
-    font-family: 'Courier New', monospace;
-}
-
-/* Sonneries */
-.ringtones {
-    background: rgba(20, 20, 40, 0.7);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.ringtones h3 {
-    color: #4cc9f0;
+    padding: 15px;
     margin-bottom: 15px;
-    font-size: 1.3rem; /* Réduit */
-    border-bottom: 1px solid rgba(76, 201, 240, 0.3);
-    padding-bottom: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
 }
 
 .ringtones-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px; /* Réduit */
+    gap: 8px;
 }
 
 .ringtone-btn {
-    padding: 8px 6px; /* Réduit */
+    padding: 6px 4px;
     background-color: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
     color: #a9a9a9;
     cursor: pointer;
-    font-size: 0.8rem; /* Réduit */
+    font-size: 0.75rem;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    min-height: 60px; /* Réduit */
+    gap: 3px;
+    min-height: 50px;
     justify-content: center;
     text-align: center;
 }
@@ -338,6 +325,7 @@ h1 {
 .ringtone-btn:hover {
     background-color: rgba(76, 201, 240, 0.1);
     color: #fff;
+    border-color: rgba(76, 201, 240, 0.3);
 }
 
 .ringtone-btn.active {
@@ -348,31 +336,26 @@ h1 {
 }
 
 .ringtone-btn i {
-    font-size: 1.2rem; /* Réduit */
+    font-size: 1rem;
 }
 
-/* Paramètres */
-.settings {
-    background: rgba(20, 20, 40, 0.7);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.settings h3 {
-    color: #4cc9f0;
+/* Paramètres compacts */
+.settings-compact {
+    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    border-radius: 10px;
+    padding: 12px;
     margin-bottom: 15px;
-    font-size: 1.3rem; /* Réduit */
-    border-bottom: 1px solid rgba(76, 201, 240, 0.3);
-    padding-bottom: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.4);
+    display: flex;
+    gap: 10px;
 }
 
 .setting-item {
-    margin-bottom: 15px;
-    padding: 10px;
+    flex: 1;
+    padding: 8px;
     background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
 }
@@ -386,15 +369,15 @@ h1 {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 0.95rem; /* Réduit */
+    font-size: 0.85rem;
     color: #d0d0d0;
     width: 100%;
 }
 
 .setting-item input[type="checkbox"] {
-    width: 18px; /* Réduit */
-    height: 18px; /* Réduit */
-    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
     cursor: pointer;
     accent-color: #4cc9f0;
     flex-shrink: 0;
@@ -406,91 +389,106 @@ h1 {
 
 .unsupported {
     color: #f72585;
-    font-size: 0.8rem; /* Réduit */
+    font-size: 0.7rem;
     font-style: italic;
-    margin-left: 8px;
+    margin-left: 6px;
     opacity: 0.8;
 }
 
-/* Pied de page */
-footer {
+/* Pied de page compact */
+.compact-footer {
     text-align: center;
-    margin-top: 15px;
-    padding-top: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #a9a9a9;
-    font-size: 0.8rem; /* Réduit */
+    font-size: 0.75rem;
 }
 
 .hint {
-    margin-top: 8px;
+    margin-top: 5px;
     font-style: italic;
     color: #888;
-    font-size: 0.8rem; /* Réduit */
+    font-size: 0.7rem;
 }
 
-/* Responsive Design - Version compacte */
+/* Responsive Design - Maintien de la transparence */
 @media (max-width: 768px) {
     body {
-        padding: 8px;
+        padding: 6px;
         font-size: 13px;
     }
     
     .container {
-        padding: 12px;
+        padding: 10px;
         max-width: 95%;
+        background-color: rgba(20, 20, 40, 0.7);
     }
     
-    h1 {
+    .header-top {
+        gap: 8px;
+    }
+    
+    .alarme-text,
+    .repetitive-text {
         font-size: 1.6rem;
     }
     
-    .time-display {
-        font-size: 3rem;
-        letter-spacing: 2px;
-        margin-bottom: 15px;
+    .logo-container {
+        width: 50px;
+        height: 50px;
     }
     
-    .progress-container {
-        height: 15px;
+    .subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .time-display {
+        font-size: 2.8rem;
         margin-bottom: 12px;
     }
     
-    .time-selectors {
-        flex-direction: column;
-        gap: 15px;
+    .timer-display {
+        background: rgba(10, 10, 25, 0.6);
     }
     
-    .time-selector {
-        min-width: 100%;
+    .controls-compact {
+        background: rgba(15, 15, 35, 0.6);
     }
     
-    .buttons-container {
-        flex-direction: column;
-        gap: 12px;
+    .ringtones-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    .settings-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    /* Le reste du responsive reste identique */
+    .main-controls {
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 12px;
     }
     
     .btn {
-        width: 100%;
-        max-width: 250px;
-        padding: 10px 15px;
-        font-size: 0.95rem;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        min-width: 80px;
     }
     
-    .cycle-counter-center {
-        order: -1;
-        width: 100%;
-        max-width: 250px;
-        margin-bottom: 8px;
-        padding: 12px 15px;
-    }
-    
-    .cycle-label-center {
-        font-size: 1rem;
+    .cycle-display {
+        padding: 8px 12px;
+        min-width: 70px;
     }
     
     .cycle-number-center {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
+    }
+    
+    .time-controls {
+        flex-direction: column;
+        gap: 12px;
     }
     
     .ringtones-grid {
@@ -498,131 +496,130 @@ footer {
         gap: 6px;
     }
     
-    .ringtone-btn {
-        padding: 6px 4px;
-        min-height: 55px;
-        font-size: 0.75rem;
-    }
-    
-    .ringtone-btn i {
-        font-size: 1rem;
-    }
-    
-    .setting-item {
-        padding: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .setting-item label {
-        font-size: 0.9rem;
-    }
-    
-    .setting-item input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        margin-right: 10px;
+    .settings-compact {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
 @media (max-width: 480px) {
     body {
-        padding: 5px;
-        font-size: 12px;
+        padding: 4px;
     }
     
     .container {
-        padding: 10px;
-        border-radius: 10px;
+        padding: 8px;
+        border-radius: 8px;
+        background-color: rgba(20, 20, 40, 0.7);
     }
     
-    .logo-container {
-        width: 70px;
-        height: 70px;
-    }
-    
-    h1 {
+    .alarme-text,
+    .repetitive-text {
         font-size: 1.4rem;
     }
     
+    .logo-container {
+        width: 45px;
+        height: 45px;
+    }
+    
     .time-display {
-        font-size: 2.5rem;
+        font-size: 2.4rem;
         letter-spacing: 1px;
     }
     
-    .progress-container {
-        height: 12px;
+    .timer-display {
+        background: rgba(10, 10, 25, 0.6);
     }
     
-    .ringtones-grid {
-        grid-template-columns: 1fr;
+    .controls-compact {
+        background: rgba(15, 15, 35, 0.6);
     }
     
-    .cycle-label-center {
-        font-size: 0.9rem;
+    .ringtones-compact {
+        background: rgba(15, 15, 35, 0.6);
     }
     
-    .cycle-number-center {
-        font-size: 1.8rem;
+    .settings-compact {
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    /* Le reste du responsive reste identique */
+    .main-controls {
+        gap: 6px;
     }
     
     .btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 70px;
     }
     
-    .btn i {
-        font-size: 0.8rem;
-    }
-    
-    .value-display {
-        font-size: 1.1rem;
-        padding: 3px 10px;
-    }
-    
-    .slider {
-        height: 8px;
-    }
-    
-    .slider::-webkit-slider-thumb {
-        width: 18px;
-        height: 18px;
-    }
-}
-
-/* Version ultra compacte pour petits écrans */
-@media (max-width: 360px) {
-    .time-display {
-        font-size: 2.2rem;
+    .cycle-display {
+        padding: 6px 10px;
+        min-width: 60px;
     }
     
     .cycle-number-center {
         font-size: 1.6rem;
     }
     
-    .buttons-container {
-        gap: 8px;
-    }
-    
-    .btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-    }
-    
     .ringtones-grid {
-        gap: 4px;
+        grid-template-columns: 1fr;
     }
     
     .ringtone-btn {
-        min-height: 50px;
+        min-height: 45px;
         padding: 5px 3px;
         font-size: 0.7rem;
     }
 }
 
-/* Animation pour la réussite (verte) */
+/* Version paysage (landscape) */
+@media (max-height: 600px) and (orientation: landscape) {
+    .container {
+        max-width: 90%;
+        background-color: rgba(20, 20, 40, 0.7);
+    }
+    
+    .compact-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .timer-display {
+        padding: 10px;
+        margin-bottom: 10px;
+        background: rgba(10, 10, 25, 0.6);
+    }
+    
+    .time-display {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .controls-compact, 
+    .ringtones-compact, 
+    .settings-compact {
+        padding: 10px;
+        margin-bottom: 10px;
+        background: rgba(15, 15, 35, 0.6);
+    }
+    
+    .main-controls {
+        margin-bottom: 10px;
+    }
+    
+    .compact-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+}
+
+/* Animation pour la réussite (verte) - BIEN VISIBLE grâce à la transparence */
 @keyframes success-pulse {
     0% { 
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
         color: #4cc9f0;
     }
     50% { 
@@ -630,30 +627,30 @@ footer {
         color: #4CAF50;
     }
     100% { 
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
         color: #4cc9f0;
     }
 }
 
 @keyframes success-glow {
     0% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-        border-color: #4361ee;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(67, 97, 238, 0.6);
     }
     50% { 
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
-        border-color: #4CAF50;
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(76, 175, 80, 0.8);
     }
     100% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-        border-color: #4361ee;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(67, 97, 238, 0.6);
     }
 }
 
 @keyframes progress-success {
-    0% { background: linear-gradient(90deg, #4361ee, #4cc9f0); }
-    50% { background: linear-gradient(90deg, #4CAF50, #2E7D32); }
-    100% { background: linear-gradient(90deg, #4361ee, #4cc9f0); }
+    0% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
+    50% { background: linear-gradient(90deg, rgba(76, 175, 80, 0.9), rgba(46, 125, 50, 0.9)); }
+    100% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
 }
 
 .success-active {
@@ -666,4 +663,15 @@ footer {
 
 .success-active ~ .progress-container .progress-bar {
     animation: progress-success 1s infinite;
+}
+
+/* Effet de fond BIEN VISIBLE grâce à la transparence */
+body.success-flash {
+    animation: body-flash 0.5s ease;
+}
+
+@keyframes body-flash {
+    0% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
+    50% { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); }
+    100% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
 }
