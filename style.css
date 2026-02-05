@@ -10,26 +10,41 @@ body {
     background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
     color: #fff;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin: 0;                    /* ← AJOUTÉ */
     padding: 8px;
-    transition: background 0.5s ease;
     font-size: 14px;
+    display: flex;                /* ← CHANGÉ : flex */
+    flex-direction: column;       /* ← CONSERVÉ */
+    align-items: center;          /* ← CONSERVÉ : centre horizontal */
+    justify-content: center;      /* ← AJOUTÉ : centre VERTICAL */
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Fond série derrière le contenu */
+#series-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.7);
 }
 
 .container {
     width: 100%;
     max-width: 500px;
-    background-color: rgba(20, 20, 40, 0.7); /* PLUS TRANSPARENT (0.7 au lieu de 0.9) */
+    background-color: rgba(20, 20, 40, 0.5);
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     padding: 12px;
-    margin: 8px 0;
+    margin: 8px 0;              /* ← REDUIT */
     border: 1px solid rgba(76, 201, 240, 0.2);
+    flex: 0 1 auto;             /* ← AJOUTÉ : ne grandit pas */
 }
 
-/* En-tête compact - Alarme - Logo - Répétitive sur une ligne */
+/* En-tête compact */
 .compact-header {
     margin-bottom: 15px;
     padding-bottom: 10px;
@@ -61,6 +76,7 @@ body {
     border: 2px solid #4cc9f0;
     box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
     flex-shrink: 0;
+    display: block;
 }
 
 .logo {
@@ -83,38 +99,47 @@ body {
     font-weight: 700;
 }
 
-.subtitle {
-    font-size: 0.9rem;
-    color: #a9a9a9;
-    font-style: italic;
+/* Bouton hamburger */
+.burger-btn {
+    background: transparent;
+    border: none;
+    color: #4cc9f0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.burger-btn:hover {
+    background: rgba(76, 201, 240, 0.12);
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.5);
+    transform: translateY(-1px);
 }
 
 /* Affichage du minuteur */
 .timer-display {
-    background: rgba(10, 10, 25, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
+    background: rgba(10, 10, 25, 0.35);
+    border-radius: 14px;           /* ← PLUS GRAND */
+    padding: 24px;                 /* ← 24px au lieu de 15px */
+    margin-bottom: 20px;           /* ← PLUS D'ESPACE */
     text-align: center;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(67, 97, 238, 0.6); /* Bordure plus transparente */
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6); /* ← PLUS INTENSE */
+    border: 3px solid rgba(67, 97, 238, 0.7);      /* ← PLUS ÉPAIS */
 }
 
 .time-display {
-    font-size: 3.2rem;
-    font-weight: 700;
-    color: #4cc9f0;
-    text-shadow: 0 0 20px rgba(76, 201, 240, 0.7);
-    margin-bottom: 15px;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 2px;
-    transition: all 0.3s ease;
+    font-size: 4.5rem;             /* ← 4.5rem au lieu de 3.2rem */
+    font-weight: 800;              /* ← PLUS LOURD */
+    margin-bottom: 20px;           /* ← PLUS D'ESPACE */
+    letter-spacing: 4px;           /* ← PLUS D'ÉCARTELEMENT */
 }
 
 .progress-container {
     width: 100%;
     height: 12px;
-    background-color: rgba(255, 255, 255, 0.08); /* PLUS TRANSPARENT */
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     overflow: hidden;
     margin-bottom: 10px;
@@ -123,7 +148,11 @@ body {
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); /* PLUS TRANSPARENT */
+    background: linear-gradient(
+        90deg,
+        rgba(67, 97, 238, 0.6),
+        rgba(76, 201, 240, 0.6)
+    );
     width: 0%;
     border-radius: 6px;
     transition: width 0.3s ease;
@@ -131,7 +160,7 @@ body {
 
 /* Contrôles compacts */
 .controls-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    background: rgba(15, 15, 35, 0.35);
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
@@ -142,13 +171,24 @@ body {
 .main-controls {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
+/* Hauteur uniforme des 3 blocs */
+.main-control-row {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(15, 15, 35, 0.4);
+    border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+/* Boutons génériques */
 .btn {
-    padding: 10px 15px;
+    padding: 0 15px;
     font-size: 0.95rem;
     font-weight: bold;
     border: none;
@@ -161,41 +201,67 @@ body {
     transition: all 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     min-width: 90px;
+    background: transparent;
 }
 
 .btn i {
     font-size: 0.8rem;
 }
 
+/* Start / Stop / Reset */
 .start-btn {
-    background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(67, 97, 238, 0.9),
+        rgba(58, 12, 163, 0.9)
+    );
     color: white;
 }
 
 .start-btn:hover {
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(58, 12, 163, 0.9),
+        rgba(67, 97, 238, 0.9)
+    );
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 .stop-btn {
-    background: linear-gradient(135deg, rgba(247, 37, 133, 0.9), rgba(181, 23, 158, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(247, 37, 133, 0.9),
+        rgba(181, 23, 158, 0.9)
+    );
     color: white;
 }
 
 .stop-btn:hover {
-    background: linear-gradient(135deg, rgba(181, 23, 158, 0.9), rgba(247, 37, 133, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(181, 23, 158, 0.9),
+        rgba(247, 37, 133, 0.9)
+    );
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 .reset-btn {
-    background: linear-gradient(135deg, rgba(114, 9, 183, 0.9), rgba(86, 11, 173, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(114, 9, 183, 0.9),
+        rgba(86, 11, 173, 0.9)
+    );
     color: white;
 }
 
 .reset-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, rgba(86, 11, 173, 0.9), rgba(114, 9, 183, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(86, 11, 173, 0.9),
+        rgba(114, 9, 183, 0.9)
+    );
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
@@ -203,18 +269,21 @@ body {
 .reset-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
+    background: linear-gradient(
+        135deg,
+        rgba(58, 12, 163, 0.9),
+        rgba(67, 97, 238, 0.9)
+    );
 }
 
+/* Bloc cycle */
 .cycle-display {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(67, 97, 238, 0.15); /* PLUS TRANSPARENT */
-    padding: 10px 15px;
+    background-color: rgba(67, 97, 238, 0.15);
     border-radius: 8px;
     border: 1px solid rgba(67, 97, 238, 0.4);
-    min-width: 80px;
     flex: 1;
 }
 
@@ -226,7 +295,7 @@ body {
     font-family: 'Courier New', monospace;
 }
 
-/* Contrôles de temps */
+/* Contrôles de temps (dans le menu) */
 .time-controls {
     display: flex;
     gap: 15px;
@@ -275,6 +344,55 @@ body {
     border: none;
     box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
 }
+/* TEINTES VERTES -
+.prepa-title {
+    color: #4CAF50 !important;
+    text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+} supprimer Préparation */
+
+.prepa-label {
+    color: #81C784 !important;
+}
+
+.prepa-slider::-webkit-slider-thumb {
+    background: #4CAF50 !important;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.8) !important;
+}
+
+.prepa-slider::-moz-range-thumb {
+    background: #4CAF50 !important;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.8) !important;
+}
+
+.prepa-value {
+    color: #4CAF50 !important;
+    background-color: rgba(76, 175, 80, 0.15) !important;
+}
+
+/* TEINTES ROUGES - Exercice */
+.cycle-title {
+    color: #f44336 !important;
+    text-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
+}
+
+.cycle-label {
+    color: #FF8A80 !important;
+}
+
+.cycle-slider::-webkit-slider-thumb {
+    background: #f44336 !important;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
+}
+
+.cycle-slider::-moz-range-thumb {
+    background: #f44336 !important;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
+}
+
+.cycle-value {
+    color: #f44336 !important;
+    background-color: rgba(244, 67, 54, 0.15) !important;
+}
 
 .value-display {
     display: block;
@@ -288,36 +406,25 @@ body {
     width: 100%;
 }
 
-/* Sonneries compactes */
-.ringtones-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(67, 97, 238, 0.4);
-}
-
+/* Sonneries */
 .ringtones-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
 .ringtone-btn {
-    padding: 6px 4px;
+    padding: 8px 4px;
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     color: #a9a9a9;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     transition: all 0.3s ease;
+    min-height: 42px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 3px;
-    min-height: 50px;
     justify-content: center;
     text-align: center;
 }
@@ -334,17 +441,27 @@ body {
     color: #4cc9f0;
     box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
 }
-
-.ringtone-btn i {
-    font-size: 1rem;
+/* Sonneries FIN PRÉPA = VERT */
+.prepa-ringtone-btn.active {
+    background-color: rgba(76, 175, 80, 0.3) !important;  /* ← VERT */
+    border-color: #4CAF50 !important;                     /* ← Bordure verte */
+    color: #4CAF50 !important;                            /* ← Texte vert */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4) !important;
+}
+/* Sonneries CYCLE = ROUGE */
+.ringtone-btn:not(.prepa-ringtone-btn).active {
+    background-color: rgba(244, 67, 54, 0.3) !important;  /* ← ROUGE */
+    border-color: #f44336 !important;                     /* ← Bordure rouge */
+    color: #f44336 !important;                            /* ← Texte rouge */
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.4) !important;
 }
 
-/* Paramètres compacts */
+/* Paramètres */
 .settings-compact {
-    background: rgba(15, 15, 35, 0.6); /* PLUS TRANSPARENT (0.6) */
+    background: rgba(15, 15, 35, 0.35);
     border-radius: 10px;
     padding: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(67, 97, 238, 0.4);
     display: flex;
@@ -395,7 +512,18 @@ body {
     opacity: 0.8;
 }
 
-/* Pied de page compact */
+/* Sélecteur d’activité */
+.activity-select {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(15, 15, 35, 0.6);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+/* Footer */
 .compact-footer {
     text-align: center;
     margin-top: 10px;
@@ -412,245 +540,101 @@ body {
     font-size: 0.7rem;
 }
 
-/* Responsive Design - Maintien de la transparence */
-@media (max-width: 768px) {
-    body {
-        padding: 6px;
-        font-size: 13px;
-    }
-    
-    .container {
-        padding: 10px;
-        max-width: 95%;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .header-top {
-        gap: 8px;
-    }
-    
-    .alarme-text,
-    .repetitive-text {
-        font-size: 1.6rem;
-    }
-    
-    .logo-container {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .time-display {
-        font-size: 2.8rem;
-        margin-bottom: 12px;
-    }
-    
-    .timer-display {
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .controls-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .ringtones-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .settings-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    /* Le reste du responsive reste identique */
-    .main-controls {
-        flex-direction: row;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-        min-width: 80px;
-    }
-    
-    .cycle-display {
-        padding: 8px 12px;
-        min-width: 70px;
-    }
-    
-    .cycle-number-center {
-        font-size: 1.8rem;
-    }
-    
-    .time-controls {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .ringtones-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-    
-    .settings-compact {
-        flex-direction: column;
-        gap: 8px;
-    }
+/* Menu hamburger (panneau latéral) */
+#burger-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80vw;
+    max-width: 340px;
+    height: 100vh;
+    background: rgba(6, 6, 20, 0.97);
+    color: #fff;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding: 14px;
+    overflow-y: auto;
 }
 
-@media (max-width: 480px) {
-    body {
-        padding: 4px;
-    }
-    
-    .container {
-        padding: 8px;
-        border-radius: 8px;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .alarme-text,
-    .repetitive-text {
-        font-size: 1.4rem;
-    }
-    
-    .logo-container {
-        width: 45px;
-        height: 45px;
-    }
-    
-    .time-display {
-        font-size: 2.4rem;
-        letter-spacing: 1px;
-    }
-    
-    .timer-display {
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .controls-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .ringtones-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .settings-compact {
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    /* Le reste du responsive reste identique */
-    .main-controls {
-        gap: 6px;
-    }
-    
-    .btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        min-width: 70px;
-    }
-    
-    .cycle-display {
-        padding: 6px 10px;
-        min-width: 60px;
-    }
-    
-    .cycle-number-center {
-        font-size: 1.6rem;
-    }
-    
-    .ringtones-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .ringtone-btn {
-        min-height: 45px;
-        padding: 5px 3px;
-        font-size: 0.7rem;
-    }
+#burger-menu.open {
+    transform: translateX(0);
 }
 
-/* Version paysage (landscape) */
-@media (max-height: 600px) and (orientation: landscape) {
-    .container {
-        max-width: 90%;
-        background-color: rgba(20, 20, 40, 0.7);
-    }
-    
-    .compact-header {
-        margin-bottom: 10px;
-        padding-bottom: 8px;
-    }
-    
-    .timer-display {
-        padding: 10px;
-        margin-bottom: 10px;
-        background: rgba(10, 10, 25, 0.6);
-    }
-    
-    .time-display {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-    
-    .controls-compact, 
-    .ringtones-compact, 
-    .settings-compact {
-        padding: 10px;
-        margin-bottom: 10px;
-        background: rgba(15, 15, 35, 0.6);
-    }
-    
-    .main-controls {
-        margin-bottom: 10px;
-    }
-    
-    .compact-footer {
-        margin-top: 8px;
-        padding-top: 8px;
-    }
+.menu-section {
+    margin-bottom: 16px;
 }
 
-/* Animation pour la réussite (verte) - BIEN VISIBLE grâce à la transparence */
+.menu-section h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #4cc9f0;
+}
+
+/* Animations de phase et de réussite */
+.phase-prepa {
+    animation: blink-prepa 1s infinite;
+}
+
+.phase-cycle {
+    animation: blink-cycle 1s infinite;
+}
+
 @keyframes success-pulse {
-    0% { 
+    0% {
         text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
         color: #4cc9f0;
     }
-    50% { 
+    50% {
         text-shadow: 0 0 30px rgba(76, 175, 80, 1);
         color: #4CAF50;
     }
-    100% { 
+    100% {
         text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
         color: #4cc9f0;
     }
 }
 
 @keyframes success-glow {
-    0% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    0% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6),
+                    inset 0 0 15px rgba(0, 0, 0, 0.5);
         border-color: rgba(67, 97, 238, 0.6);
     }
-    50% { 
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9),
+                    inset 0 0 15px rgba(0, 0, 0, 0.5);
         border-color: rgba(76, 175, 80, 0.8);
     }
-    100% { 
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    100% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6),
+                    inset 0 0 15px rgba(0, 0, 0, 0.5);
         border-color: rgba(67, 97, 238, 0.6);
     }
 }
 
 @keyframes progress-success {
-    0% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
-    50% { background: linear-gradient(90deg, rgba(76, 175, 80, 0.9), rgba(46, 125, 50, 0.9)); }
-    100% { background: linear-gradient(90deg, rgba(67, 97, 238, 0.8), rgba(76, 201, 240, 0.8)); }
+    0% {
+        background: linear-gradient(
+            90deg,
+            rgba(67, 97, 238, 0.8),
+            rgba(76, 201, 240, 0.8)
+        );
+    }
+    50% {
+        background: linear-gradient(
+            90deg,
+            rgba(76, 175, 80, 0.9),
+            rgba(46, 125, 50, 0.9)
+        );
+    }
+    100% {
+        background: linear-gradient(
+            90deg,
+            rgba(67, 97, 238, 0.8),
+            rgba(76, 201, 240, 0.8)
+        );
+    }
 }
 
 .success-active {
@@ -665,13 +649,177 @@ body {
     animation: progress-success 1s infinite;
 }
 
-/* Effet de fond BIEN VISIBLE grâce à la transparence */
+/* Flash global de succès */
 body.success-flash {
     animation: body-flash 0.5s ease;
+}
+/* Cercle 360° vert/rouge */
+#circular-timer {
+       width: 200px;                  /* ← 200px au lieu de 140px */
+    height: 200px;                 /* ← 200px au lieu de 140px */
+    margin: 20px auto 0;           /* ← PLUS D'ESPACE */
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        limegreen 0deg 0deg,      /* Prépa (vert) */
+        red 0deg 0deg,            /* Cycle (rouge) */
+        transparent 0deg 360deg   /* Reste vide */
+    );
+    transition: background 0.3s ease;
+}
+
+#circular-timer::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: rgba(10, 10, 25, 0.8);
+    z-index: 1;
 }
 
 @keyframes body-flash {
     0% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
     50% { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); }
     100% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .container {
+        padding: 10px;
+        max-width: 95%;
+        background-color: rgba(20, 20, 40, 0.5);
+    }
+
+    .header-top {
+        gap: 8px;
+    }
+
+    .alarme-text,
+    .repetitive-text {
+        font-size: 1.6rem;
+    }
+
+    .logo-container {
+        width: 50px;
+        height: 50px;
+    }
+
+    .time-display {
+        font-size: 2.8rem;
+        margin-bottom: 12px;
+    }
+
+    .timer-display {
+        background: rgba(10, 10, 25, 0.35);
+    }
+
+    .main-controls {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        min-width: 80px;
+    }
+
+    .cycle-number-center {
+        font-size: 1.8rem;
+    }
+
+    .ringtones-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #burger-menu {
+        width: 88vw;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 4px;
+    }
+
+    .container {
+        padding: 8px;
+        border-radius: 8px;
+        background-color: rgba(20, 20, 40, 0.5);
+    }
+
+    .alarme-text,
+    .repetitive-text {
+        font-size: 1.4rem;
+    }
+
+    .logo-container {
+        width: 45px;
+        height: 45px;
+    }
+
+    .time-display {
+        font-size: 2.4rem;
+        letter-spacing: 1px;
+    }
+
+    .main-controls {
+        gap: 6px;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+        min-width: 70px;
+    }
+
+    .cycle-number-center {
+        font-size: 1.6rem;
+    }
+
+    .ringtones-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ringtone-btn {
+        min-height: 45px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Paysage */
+@media (max-height: 600px) and (orientation: landscape) {
+    .container {
+        max-width: 90%;
+        background-color: rgba(20, 20, 40, 0.5);
+    }
+
+    .compact-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+
+    .timer-display {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .time-display {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .controls-compact {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .compact-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+    }
 }
