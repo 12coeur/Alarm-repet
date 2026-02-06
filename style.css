@@ -10,38 +10,31 @@ body {
     background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
     color: #fff;
     min-height: 100vh;
-    margin: 0;                    /* ← AJOUTÉ */
-    padding: 8px;
+    margin: 0;
+    padding: 0;
     font-size: 14px;
-    display: flex;                /* ← CHANGÉ : flex */
-    flex-direction: column;       /* ← CONSERVÉ */
-    align-items: center;          /* ← CONSERVÉ : centre horizontal */
-    justify-content: center;      /* ← AJOUTÉ : centre VERTICAL */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     position: relative;
     overflow-x: hidden;
 }
 
-/* Fond série derrière le contenu */
-#series-background {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: brightness(0.7);
-}
-
 .container {
     width: 100%;
-    max-width: 500px;
+    max-width: min(80vw, 500px);
+    max-height: 80vh;
     background-color: rgba(20, 20, 40, 0.5);
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     padding: 12px;
-    margin: 8px 0;              /* ← REDUIT */
+    margin-top: 10vh;
+    margin-bottom: 8px;
     border: 1px solid rgba(76, 201, 240, 0.2);
-    flex: 0 1 auto;             /* ← AJOUTÉ : ne grandit pas */
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
 }
 
 /* En-tête compact */
@@ -85,20 +78,6 @@ body {
     object-fit: cover;
 }
 
-.header-right {
-    flex: 1;
-    text-align: left;
-    margin-left: 10px;
-}
-
-.repetitive-text {
-    font-size: 1.8rem;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
-    margin-bottom: 2px;
-    font-weight: 700;
-}
-
 /* Bouton hamburger */
 .burger-btn {
     background: transparent;
@@ -118,31 +97,73 @@ body {
     transform: translateY(-1px);
 }
 
-/* Affichage du minuteur */
-.timer-display {
-    background: rgba(10, 10, 25, 0.35);
-    border-radius: 14px;           /* ← PLUS GRAND */
-    padding: 24px;                 /* ← 24px au lieu de 15px */
-    margin-bottom: 20px;           /* ← PLUS D'ESPACE */
-    text-align: center;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6); /* ← PLUS INTENSE */
-    border: 3px solid rgba(67, 97, 238, 0.7);      /* ← PLUS ÉPAIS */
+/* Conteneur pour image + secteur + texte */
+.sector-with-background {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 20px auto;
+    z-index: 1;
+    /* SUPPRIMER border-radius et overflow ici */
 }
 
-.time-display {
-    font-size: 4.5rem;             /* ← 4.5rem au lieu de 3.2rem */
-    font-weight: 800;              /* ← PLUS LOURD */
-    margin-bottom: 20px;           /* ← PLUS D'ESPACE */
-    letter-spacing: 4px;           /* ← PLUS D'ÉCARTELEMENT */
+/* Image de série - 16:9 QUI DÉBORDE */
+.series-image-reduced {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%; /* Plus large que le cercle */
+    height: calc(120% * 9 / 16); /* Ratio 16:9 */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1; /* Derrière le secteur */
+    animation: fadeImage 2s ease-in-out infinite;
+    /* L'image peut déborder */
 }
 
-.progress-container {
+/* Secteur compte à rebours - ANNEAU SEULEMENT (masque circulaire) */
+.circular-timer-sector {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
+    height: 100%;
+    border-radius: 50%; /* ICI on garde le cercle */
+    mask: radial-gradient(circle, transparent 65%, black 66%);
+    -webkit-mask: radial-gradient(circle, transparent 65%, black 66%);
+    z-index: 2; /* Au-dessus de l'image */
+    transition: background 0.3s ease;
+}
+
+/* Texte du compte à rebours - PAR DESSUS TOUT */
+.time-display-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 
+        0 0 10px rgba(76, 201, 240, 0.8),
+        0 0 20px rgba(76, 201, 240, 0.6),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 3; /* Au-dessus du secteur et de l'image */
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+/* Barre de progression */
+.progress-container {
+    width: 80%;
     height: 12px;
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 10px;
+    margin: 0 auto 20px auto;
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -344,11 +365,6 @@ body {
     border: none;
     box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
 }
-/* TEINTES VERTES -
-.prepa-title {
-    color: #4CAF50 !important;
-    text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
-} supprimer Préparation */
 
 .prepa-label {
     color: #81C784 !important;
@@ -366,63 +382,56 @@ body {
 
 .prepa-value {
     color: #4CAF50 !important;
-    background-color: rgba(76, 175, 80, 0.15) !important;
+    text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
 }
 
-/* TEINTES ROUGES - Exercice */
 .cycle-title {
-    color: #f44336 !important;
-    text-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
-}
-
-.cycle-label {
-    color: #FF8A80 !important;
+    color: #F44336 !important;
+    text-shadow: 0 0 8px rgba(0,255,0, 0.6);
 }
 
 .cycle-slider::-webkit-slider-thumb {
-    background: #f44336 !important;
-    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
+    background: #F44336 !important;
+    box-shadow: 0 0 8px rgba(0,255,0, 0.8) !important;
 }
 
 .cycle-slider::-moz-range-thumb {
-    background: #f44336 !important;
-    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
+    background: #F44336 !important;
+    box-shadow: 0 0 8px rgba(0,255,0, 0.8) !important;
 }
 
 .cycle-value {
-    color: #f44336 !important;
-    background-color: rgba(244, 67, 54, 0.15) !important;
+    color: #F44336 !important;
+    text-shadow: 0 0 8px rgba(0,255,0, 0.6);
 }
 
 .value-display {
     display: block;
-    font-size: 1.1rem;
+    text-align: center;
+    font-size: 1rem;
     font-weight: bold;
     color: #4cc9f0;
-    background-color: rgba(76, 201, 240, 0.1);
-    padding: 3px 10px;
-    border-radius: 6px;
-    text-align: center;
-    width: 100%;
+    text-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
 }
 
-/* Sonneries */
+/* Grille de sonneries */
 .ringtones-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
+    margin-top: 8px;
 }
 
 .ringtone-btn {
     padding: 8px 4px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(76, 201, 240, 0.3);
+    background-color: rgba(15, 15, 35, 0.6);
+    color: #d0d0d0;
     border-radius: 6px;
-    color: #a9a9a9;
     cursor: pointer;
-    font-size: 0.8rem;
     transition: all 0.3s ease;
-    min-height: 42px;
+    font-size: 0.65rem;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -430,30 +439,22 @@ body {
 }
 
 .ringtone-btn:hover {
-    background-color: rgba(76, 201, 240, 0.1);
-    color: #fff;
-    border-color: rgba(76, 201, 240, 0.3);
+    background-color: rgba(76, 201, 240, 0.2);
+    border-color: rgba(76, 201, 240, 0.6);
 }
 
 .ringtone-btn.active {
-    background-color: rgba(76, 201, 240, 0.2);
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.5), rgba(58, 12, 163, 0.5));
     border-color: #4cc9f0;
-    color: #4cc9f0;
-    box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(76, 201, 240, 0.6);
 }
-/* Sonneries FIN PRÉPA = VERT */
+
 .prepa-ringtone-btn.active {
-    background-color: rgba(76, 175, 80, 0.3) !important;  /* ← VERT */
-    border-color: #4CAF50 !important;                     /* ← Bordure verte */
-    color: #4CAF50 !important;                            /* ← Texte vert */
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4) !important;
-}
-/* Sonneries CYCLE = ROUGE */
-.ringtone-btn:not(.prepa-ringtone-btn).active {
-    background-color: rgba(244, 67, 54, 0.3) !important;  /* ← ROUGE */
-    border-color: #f44336 !important;                     /* ← Bordure rouge */
-    color: #f44336 !important;                            /* ← Texte rouge */
-    box-shadow: 0 0 10px rgba(244, 67, 54, 0.4) !important;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.5), rgba(46, 125, 50, 0.5));
+    border-color: #4CAF50;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
 }
 
 /* Paramètres */
@@ -512,7 +513,7 @@ body {
     opacity: 0.8;
 }
 
-/* Sélecteur d’activité */
+/* Sélecteur d'activité */
 .activity-select {
     width: 100%;
     padding: 6px 8px;
@@ -531,13 +532,6 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #a9a9a9;
     font-size: 0.75rem;
-}
-
-.hint {
-    margin-top: 5px;
-    font-style: italic;
-    color: #888;
-    font-size: 0.7rem;
 }
 
 /* Menu hamburger (panneau latéral) */
@@ -571,69 +565,31 @@ body {
     color: #4cc9f0;
 }
 
-/* Animations de phase et de réussite */
-.phase-prepa {
-    animation: blink-prepa 1s infinite;
-}
-
-.phase-cycle {
-    animation: blink-cycle 1s infinite;
+/* Animations */
+@keyframes fadeImage {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
 }
 
 @keyframes success-pulse {
-    0% {
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
-        color: #4cc9f0;
-    }
-    50% {
-        text-shadow: 0 0 30px rgba(76, 175, 80, 1);
-        color: #4CAF50;
-    }
-    100% {
-        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
-        color: #4cc9f0;
-    }
+    0%   { text-shadow: 0 0 15px rgba(244, 67, 54, 0.8); color: #F44336; }
+    50%  { text-shadow: 0 0 30px rgba(244, 67, 54, 1);   color: #D32F2F; }
+    100% { text-shadow: 0 0 15px rgba(244, 67, 54, 0.8); color: #F44336; }
 }
 
-@keyframes success-glow {
-    0% {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6),
-                    inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(67, 97, 238, 0.6);
+@keyframes body-flash {
+    0% { 
+        background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
+        box-shadow: inset 0 0 0 0 rgba(76, 201, 240, 0);
     }
-    50% {
-        box-shadow: 0 0 20px rgba(76, 175, 80, 0.9),
-                    inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(76, 175, 80, 0.8);
+    50% { 
+        background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
+        box-shadow: inset 0 0 100px 50px rgba(76, 201, 240, 0.5); /* Lumière bleue interne */
     }
-    100% {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6),
-                    inset 0 0 15px rgba(0, 0, 0, 0.5);
-        border-color: rgba(67, 97, 238, 0.6);
-    }
-}
-
-@keyframes progress-success {
-    0% {
-        background: linear-gradient(
-            90deg,
-            rgba(67, 97, 238, 0.8),
-            rgba(76, 201, 240, 0.8)
-        );
-    }
-    50% {
-        background: linear-gradient(
-            90deg,
-            rgba(76, 175, 80, 0.9),
-            rgba(46, 125, 50, 0.9)
-        );
-    }
-    100% {
-        background: linear-gradient(
-            90deg,
-            rgba(67, 97, 238, 0.8),
-            rgba(76, 201, 240, 0.8)
-        );
+    100% { 
+        background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
+        box-shadow: inset 0 0 0 0 rgba(76, 201, 240, 0);
     }
 }
 
@@ -641,46 +597,9 @@ body {
     animation: success-pulse 1s infinite;
 }
 
-.success-active ~ .progress-container {
-    animation: success-glow 1s infinite;
-}
-
-.success-active ~ .progress-container .progress-bar {
-    animation: progress-success 1s infinite;
-}
-
 /* Flash global de succès */
 body.success-flash {
     animation: body-flash 0.5s ease;
-}
-/* Cercle 360° vert/rouge */
-#circular-timer {
-       width: 200px;                  /* ← 200px au lieu de 140px */
-    height: 200px;                 /* ← 200px au lieu de 140px */
-    margin: 20px auto 0;           /* ← PLUS D'ESPACE */
-    border-radius: 50%;
-    position: relative;
-    background: conic-gradient(
-        limegreen 0deg 0deg,      /* Prépa (vert) */
-        red 0deg 0deg,            /* Cycle (rouge) */
-        transparent 0deg 360deg   /* Reste vide */
-    );
-    transition: background 0.3s ease;
-}
-
-#circular-timer::after {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border-radius: 50%;
-    background: rgba(10, 10, 25, 0.8);
-    z-index: 1;
-}
-
-@keyframes body-flash {
-    0% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
-    50% { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); }
-    100% { background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%); }
 }
 
 /* Responsive */
@@ -692,7 +611,7 @@ body.success-flash {
 
     .container {
         padding: 10px;
-        max-width: 95%;
+        max-width: 80vw;
         background-color: rgba(20, 20, 40, 0.5);
     }
 
@@ -700,8 +619,7 @@ body.success-flash {
         gap: 8px;
     }
 
-    .alarme-text,
-    .repetitive-text {
+    .alarme-text {
         font-size: 1.6rem;
     }
 
@@ -710,13 +628,18 @@ body.success-flash {
         height: 50px;
     }
 
-    .time-display {
-        font-size: 2.8rem;
-        margin-bottom: 12px;
+    .sector-with-background {
+        width: 200px;
+        height: 200px;
+        margin: 15px auto;
     }
 
-    .timer-display {
-        background: rgba(10, 10, 25, 0.35);
+    .time-display-overlay {
+        font-size: 2.8rem;
+    }
+
+    .progress-container {
+        width: 85%;
     }
 
     .main-controls {
@@ -753,8 +676,7 @@ body.success-flash {
         background-color: rgba(20, 20, 40, 0.5);
     }
 
-    .alarme-text,
-    .repetitive-text {
+    .alarme-text {
         font-size: 1.4rem;
     }
 
@@ -763,9 +685,19 @@ body.success-flash {
         height: 45px;
     }
 
-    .time-display {
+    .sector-with-background {
+        width: 180px;
+        height: 180px;
+        margin: 10px auto;
+    }
+
+    .time-display-overlay {
         font-size: 2.4rem;
         letter-spacing: 1px;
+    }
+
+    .progress-container {
+        width: 90%;
     }
 
     .main-controls {
@@ -787,7 +719,7 @@ body.success-flash {
 
     .ringtone-btn {
         min-height: 45px;
-        font-size: 0.7rem;
+        font-size: 0.6rem;
     }
 }
 
@@ -803,13 +735,17 @@ body.success-flash {
         padding-bottom: 8px;
     }
 
-    .timer-display {
-        padding: 10px;
+    .sector-with-background {
+        width: 160px;
+        height: 160px;
         margin-bottom: 10px;
     }
 
-    .time-display {
-        font-size: 2.5rem;
+    .time-display-overlay {
+        font-size: 2.2rem;
+    }
+
+    .progress-container {
         margin-bottom: 10px;
     }
 
