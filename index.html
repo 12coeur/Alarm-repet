@@ -12,15 +12,11 @@
     <link rel="icon" href="Images/logo.png" type="image/png">
 </head>
 <body>
-    <!-- Image de fond de série -->
-    <div id="series-background"></div>
-
     <div class="container">
-	
         <!-- Header compact -->
         <header class="compact-header">
             <div class="header-top">      
-			<!-- Bouton hamburger permanent -->
+                <!-- Bouton hamburger permanent -->
                 <button id="burger-btn" class="burger-btn"
                         aria-label="Menu">
                     <i class="fas fa-bars"></i>
@@ -33,24 +29,29 @@
                    class="logo-container">
                     <img src="Images/logo.png" alt="Logo JL Humez" class="logo">
                 </a>
-
-
-
             </div>
         </header>
 
         <main>
             <div class="timer-section">
-                <!-- Affichage principal : temps + barre de progression -->
-                <div class="timer-display">
-                    <div class="time-display" id="timeDisplay">00:05</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
+                <!-- Conteneur pour image + secteur + texte -->
+                <div class="sector-with-background">
+                    <!-- Image de série (derrière le secteur, taille réduite) -->
+                    <div id="series-image-behind" class="series-image-reduced"></div>
+                    
+                    <!-- Secteur compte à rebours (anneau circulaire) -->
+                    <div id="circular-timer" class="circular-timer-sector"></div>
+                    
+                    <!-- Texte du compte à rebours (par-dessus tout) -->
+                    <div class="time-display-overlay" id="timeDisplay">00:05</div>
                 </div>
-				<div id="circular-timer"></div>
-
-                <!-- Contrôles principaux épurés -->
+                
+                <!-- Barre de progression -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <!-- Contrôles -->
                 <div class="controls-compact">
                     <div class="main-controls">
                         <button id="startStopBtn"
@@ -73,42 +74,40 @@
         </main>
 
         <footer class="compact-footer">
-            <p>Alarme Répétitive &copy; <span id="currentYear"></span> - Asde Coeur</p>
-         </footer>
+            <p>Alarme Répétitive &copy; <span id="currentYear"></span> **2 activités - Asde Coeur</p>
+        </footer>
     </div>
 
     <!-- PANNEAU LATÉRAL MENU HAMBURGER -->
     <nav id="burger-menu" aria-hidden="true">
+        <!-- 1. Temps de préparation (VERT) -->
+        <section class="menu-section">
+            <label class="time-label prepa-label" for="secondes_prepa">
+                Temps de préparation / récupération
+            </label>
+            <input type="range" id="secondes_prepa"
+                   min="0" max="60" value="5" step="1" 
+                   class="slider prepa-slider">
+            <span class="value-display prepa-value" id="secondesPrepaValue">5</span>
+        </section>
 
-<!-- 1. Temps de préparation (VERT) - SANS "Secondes" -->
-<section class="menu-section">
-    <label class="time-label prepa-label" for="secondes_prepa">
-        Temps de préparation / récupération
-    </label>
-<input type="range" id="secondes_prepa"
-       min="0" max="60" value="5" step="1" 
-       class="slider prepa-slider">
-    <span class="value-display prepa-value" id="secondesPrepaValue">5</span>
-</section>
+        <!-- Sonneries PRÉPA -->
+        <section class="menu-section">
+            <div class="ringtones-grid" id="prepaRingtonesContainer">
+                <!-- Rempli par JS -->
+            </div>
+        </section>
 
-<!-- NOUVELLE SECTION : Sonneries FIN DE PRÉPA -->
-<section class="menu-section">
-    <div class="ringtones-grid" id="prepaRingtonesContainer">
-        <!-- Rempli par JS -->
-    </div>
-</section>
-
-<section class="menu-section">
-    <h3 class="cycle-title">Exercice</h3>
-    <div class="time-controls">
-        <div class="time-selector-compact">
-       <!--     <div class="time-label cycle-label">Secondes</div>SUPPRESSION -->
-            <input type="range" id="seconds"
-                   min="1" max="300" value="5" class="slider cycle-slider">
-            <span class="value-display cycle-value" id="secondsValue">5</span>
-        </div>
-    </div>
-</section>
+        <section class="menu-section">
+            <h3 class="cycle-title">Exercice</h3>
+            <div class="time-controls">
+                <div class="time-selector-compact">
+                    <input type="range" id="seconds"
+                           min="1" max="300" value="5" class="slider cycle-slider">
+                    <span class="value-display cycle-value" id="secondsValue">5</span>
+                </div>
+            </div>
+        </section>
 
         <!-- 2. Sonneries (6, sans icônes) -->
         <section class="menu-section">
@@ -117,12 +116,12 @@
             </div>
         </section>
 
-        <!-- 3. Choix d’activité -->
+        <!-- 3. Choix d'activité -->
         <section class="menu-section">
             <h3>Activité</h3>
             <select id="activity-select" class="activity-select">
                 <option value="allonge">Allongements</option>
-				 <option value="gainage">Gainage</option>
+                <option value="gainage">Gainage</option>
             </select>
         </section>
 
@@ -145,25 +144,24 @@
             </div>
         </section>
 
-        <!-- 5. Texte d’information -->
+        <!-- 5. Texte d'information -->
         <section class="menu-section">
             <h3>À propos</h3>
             <p>
-                Alarme Répétitive © 2026 - Asde Coeur.<br>
+                Alarme Répétitive © 2026 - Asde Coeur. <br>
                 Compte à rebours répétitif comme un sablier, avec temps de
-                préparation et cycles d’activité.
+                préparation et cycles d'activité.
             </p>
             <p>
                 Réglez le temps de préparation (vert) puis la durée du cycle
                 (rouge). Le temps de préparation/ récupération en vert va en décroissant, puis le
                 cycle de travail rouge à son tour.
-				</p>
-			<p>	
-				Cet outil a été créé afin de garder les mains libres durant vos entraînements. Il fonctionne sur tous les appareils et ne nécessite aucune installation
             </p>
-			
-			<p>
-Si vous désirez une animation personalisée (dans les activités), abonnez vous à chaine Youtube et je vous fais cela!!!
+            <p>	
+                Cet outil a été créé afin de garder les mains libres durant vos entraînements. Il fonctionne sur tous les appareils et ne nécessite aucune installation
+            </p>
+            <p>
+                Si vous désirez une animation personalisée (dans les activités), abonnez vous à chaine Youtube et je vous fais cela!!!
             </p>
         </section>
     </nav>
