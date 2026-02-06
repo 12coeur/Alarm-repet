@@ -1,18 +1,18 @@
 // Variables globales
 let timerInterval = null;
-let prepaSeconds = 5;        // Temps de préparation
-let workSeconds = 5;         // Durée du cycle d'exercice
+let prepaSeconds = 5;
+let workSeconds = 5;
 let currentPrepa = 5;
 let currentWork = 5;
 let totalSeconds = 10;
 let isRunning = false;
 let cycles = 0;
-let selectedRingtone = 'sonnerie1.wav';      // Sonnerie fin cycle
-let selectedPrepaRingtone = 'sonnerie4.wav'; // ← Sonnerie fin prépa (PAR DÉFAUT)
+let selectedRingtone = 'sonnerie1.wav';
+let selectedPrepaRingtone = 'sonnerie4.wav';
 let wakeLock = null;
 let wakeLockEnabled = true;
 let vibrateEnabled = true;
-let phase = 'idle';  // 'idle' | 'prepa' | 'work'
+let phase = 'idle';
 
 // Éléments DOM
 const timeDisplay = document.getElementById('timeDisplay');
@@ -31,7 +31,6 @@ const wakeLockCheckbox = document.getElementById('wakeLock');
 const vibrateCheckbox = document.getElementById('vibrate');
 const burgerBtn = document.getElementById('burger-btn');
 const burgerMenu = document.getElementById('burger-menu');
-const seriesBackground = document.getElementById('series-background');
 const activitySelect = document.getElementById('activity-select');
 
 const SERIES = {
@@ -50,16 +49,22 @@ let currentSeries = 'allonge';
 // Initialisation
 function initApp() {
     prepaSlider.value = 5;
-    prepaSlider.max = 60;        // ← AJOUTÉ
-    prepaSlider.step = 1;        // ← AJOUTÉ
+    prepaSlider.max = 60;
+    prepaSlider.step = 1;
     updateTimeFromSliders();
-    createPrepaRingtoneButtons();  // ← Sonneries fin prépa
-    createRingtoneButtons();       // Sonneries fin cycle
+    createPrepaRingtoneButtons();
+    createRingtoneButtons();
     setupEventListeners();
     updateDisplay();
     document.getElementById('currentYear').textContent = new Date().getFullYear();
     checkWakeLockSupport();
-    updateBackgroundForCycle();
+    
+    // Initialiser l'image derrière le secteur
+    const seriesImageBehind = document.getElementById('series-image-behind');
+    if (seriesImageBehind) {
+        seriesImageBehind.style.transition = 'background-image 0.5s ease-in-out';
+        updateBackgroundForCycle();
+    }
 }
 
 // Met à jour le temps total
@@ -99,7 +104,7 @@ function updateDisplay() {
     }
 }
 
-// CERCLE 360° VERT → ROUGE
+// CERCLE 360° - SECTEUR SEULEMENT
 function updateCircularTimer() {
     const circularTimer = document.getElementById('circular-timer');
     if (!circularTimer) return;
@@ -107,33 +112,46 @@ function updateCircularTimer() {
     if (phase === 'prepa') {
         const prepaProgress = (prepaSeconds - currentPrepa) / prepaSeconds;
         const angleVert = 360 * (1 - prepaProgress);
+        
+        // Secteur vert progressif
         circularTimer.style.background = `
             conic-gradient(
-                limegreen 0deg ${angleVert}deg,
+                rgba(76, 175, 80, 0.7) 0deg ${angleVert}deg,
                 transparent ${angleVert}deg 360deg
             )
         `;
+        
     } else if (phase === 'work') {
         const cycleProgress = (workSeconds - currentWork) / workSeconds;
         const angleRouge = 360 * (1 - cycleProgress);
+        
+        // Secteur rouge progressif
         circularTimer.style.background = `
             conic-gradient(
-                red 0deg ${angleRouge}deg,
+                rgba(244, 67, 54, 0.7) 0deg ${angleRouge}deg,
                 transparent ${angleRouge}deg 360deg
+            )
+        `;
+        
+    } else {
+        // État idle - très discret
+        circularTimer.style.background = `
+            conic-gradient(
+                rgba(255, 255, 255, 0.05) 0deg 360deg
             )
         `;
     }
 }
 
-// Sonneries FIN PRÉPA (6 boutons)
+// Sonneries PRÉPA (6 boutons)
 function createPrepaRingtoneButtons() {
     const ringtones = [
-        { id: 1, name: 'Fin prépa 1', file: 'sonnerie1.wav' },
-        { id: 2, name: 'Fin prépa 2', file: 'sonnerie2.wav' },
-        { id: 3, name: 'Fin prépa 3', file: 'sonnerie3.wav' },
-        { id: 4, name: 'Fin prépa 4', file: 'sonnerie4.wav' },  // ← DÉFAUT
-        { id: 5, name: 'Fin prépa 5', file: 'sonnerie5.wav' },
-        { id: 6, name: 'Fin prépa 6', file: 'sonnerie6.wav' }
+        { id: 1, name: 'Prépa 1', file: 'sonnerie1.wav' },
+        { id: 2, name: 'Prépa 2', file: 'sonnerie2.wav' },
+        { id: 3, name: 'Prépa 3', file: 'sonnerie3.wav' },
+        { id: 4, name: 'Prépa 4', file: 'sonnerie4.wav' },
+        { id: 5, name: 'Prépa 5', file: 'sonnerie5.wav' },
+        { id: 6, name: 'Prépa 6', file: 'sonnerie6.wav' }
     ];
     
     prepaRingtonesContainer.innerHTML = '';
@@ -142,6 +160,7 @@ function createPrepaRingtoneButtons() {
         const button = document.createElement('button');
         button.className = `ringtone-btn prepa-ringtone-btn ${ringtone.id === 4 ? 'active' : ''}`;
         button.textContent = ringtone.name;
+        button.dataset.file = ringtone.file;
         
         button.addEventListener('click', () => {
             selectPrepaRingtone(ringtone.file, button);
@@ -153,6 +172,11 @@ function createPrepaRingtoneButtons() {
 }
 
 function selectPrepaRingtone(ringtoneFile, button) {
+    if (ringtoneFile === selectedRingtone) {
+        alert('Vous ne pouvez pas choisir la même sonnerie pour Prépa et Son. Veuillez en choisir une autre.');
+        return;
+    }
+    
     document.querySelectorAll('.prepa-ringtone-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -167,10 +191,10 @@ function playRingtonePreview(ringtoneFile) {
     previewAudio.play().catch(e => console.log("Aperçu impossible:", e));
 }
 
-// Sonneries FIN CYCLE (6 boutons existants)
+// Sonneries FIN CYCLE (6 boutons)
 function createRingtoneButtons() {
-    const ringtones =[
-        { id: 1, name: 'Son 1', file: 'sonnerie1.wav' },     // ← "Son" au lieu de "Succès"
+    const ringtones = [
+        { id: 1, name: 'Son 1', file: 'sonnerie1.wav' },
         { id: 2, name: 'Son 2', file: 'sonnerie2.wav' },
         { id: 3, name: 'Son 3', file: 'sonnerie3.wav' },
         { id: 4, name: 'Son 4', file: 'sonnerie4.wav' },
@@ -184,6 +208,7 @@ function createRingtoneButtons() {
         const button = document.createElement('button');
         button.className = `ringtone-btn ${ringtone.id === 1 ? 'active' : ''}`;
         button.textContent = ringtone.name;
+        button.dataset.file = ringtone.file;
         
         button.addEventListener('click', () => {
             selectRingtone(ringtone.file, button);
@@ -195,6 +220,11 @@ function createRingtoneButtons() {
 }
 
 function selectRingtone(ringtoneFile, button) {
+    if (ringtoneFile === selectedPrepaRingtone) {
+        alert('Vous ne pouvez pas choisir la même sonnerie pour Son et Prépa. Veuillez en choisir une autre.');
+        return;
+    }
+    
     document.querySelectorAll('.ringtone-btn:not(.prepa-ringtone-btn)').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -227,7 +257,6 @@ function startTimer() {
     secondsSlider.disabled = true;
     resetBtn.disabled = false;
     
-    setPhaseVisuals();
     timerInterval = setInterval(updateTimer, 1000);
 }
 
@@ -249,18 +278,13 @@ function stopTimer() {
     phase = 'idle';
 }
 
-function setPhaseVisuals() {
-    // Rien : cercle gère tout !
-}
-
 function updateTimer() {
     if (phase === 'prepa') {
         currentPrepa--;
         if (currentPrepa <= 0) {
             currentPrepa = 0;
-            playPrepaEndSound();  // ← SONNERIE FIN PRÉPA !
+            playPrepaEndSound();
             phase = 'work';
-            setPhaseVisuals();
         }
     } else if (phase === 'work') {
         currentWork--;
@@ -275,7 +299,6 @@ function updateTimer() {
                 currentPrepa = prepaSeconds;
                 currentWork = workSeconds;
                 phase = prepaSeconds > 0 ? 'prepa' : 'work';
-                setPhaseVisuals();
                 updateDisplay();
             }, 100);
             return;
@@ -311,13 +334,13 @@ function flashSuccess() {
 function updateBackgroundForCycle() {
     const seriesConfig = SERIES[currentSeries] || SERIES.allonge;
     const index = (cycles % seriesConfig.maxImages) || seriesConfig.maxImages;
-
-    if (seriesBackground) {
-        seriesBackground.style.backgroundImage =
+    
+    const seriesImageBehind = document.getElementById('series-image-behind');
+    if (seriesImageBehind) {
+        seriesImageBehind.style.backgroundImage =
             `url('${seriesConfig.folder}/serie${index}.png')`;
     }
 }
-
 
 // Wake Lock
 async function requestWakeLock() {
@@ -354,11 +377,11 @@ function setupEventListeners() {
     
     burgerBtn.addEventListener('click', () => burgerMenu.classList.toggle('open'));
  
- activitySelect.addEventListener('change', () => {
-    currentSeries = activitySelect.value;
-    cycles = 0;                      // on repart au début
-    updateBackgroundForCycle();      // recharge serie1 de la nouvelle série
-});
+    activitySelect.addEventListener('change', () => {
+        currentSeries = activitySelect.value;
+        cycles = 0;
+        updateBackgroundForCycle();
+    });
   
     document.addEventListener('click', (e) => {
         if (!burgerMenu.contains(e.target) && !burgerBtn.contains(e.target)) {
