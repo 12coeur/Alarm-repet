@@ -41,6 +41,10 @@ const SERIES = {
     gainage: {
         folder: 'Images/gainage',
         maxImages: 10
+    },
+	   ballon: {
+        folder: 'Images/ballon',
+        maxImages: 10
     }
 };
 
