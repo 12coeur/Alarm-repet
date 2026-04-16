@@ -2,31 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, maximum-scale=5.0, user-scalable=yes">
-    <title>Alarme Répétitive</title>
-
+    <meta name="viewport" content="width=device-width, maximum-scale=5.0, user-scalable=yes">
+    <title>Alarme Répétitive | Chrono / Compteur</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="Images/logo.png" type="image/png">
 </head>
-<body>
+<body class="mode-chrono">
     <div class="container">
-        <!-- Header compact -->
         <header class="compact-header">
             <div class="header-top">      
-                <!-- Bouton hamburger permanent -->
-                <button id="burger-btn" class="burger-btn"
-                        aria-label="Menu">
+                <button id="burger-btn" class="burger-btn" aria-label="Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 class="alarme-text">Alarme répétitive</h1>
-
-                <!-- Logo = lien YouTube -->
-                <a href="https://www.youtube.com/@jlhumez"
-                   target="_blank" rel="noopener"
-                   class="logo-container">
+                <a href="https://www.youtube.com/@jlhumez" target="_blank" rel="noopener" class="logo-container">
                     <img src="Images/logo.png" alt="Logo JL Humez" class="logo">
                 </a>
             </div>
@@ -34,40 +24,22 @@
 
         <main>
             <div class="timer-section">
-                <!-- Conteneur pour image + secteur + texte -->
                 <div class="sector-with-background">
-                    <!-- Image de série (derrière le secteur, taille réduite) -->
                     <div id="series-image-behind" class="series-image-reduced"></div>
-                    
-                    <!-- Secteur compte à rebours (anneau circulaire) -->
                     <div id="circular-timer" class="circular-timer-sector"></div>
-                    
-                    <!-- Texte du compte à rebours (par-dessus tout) -->
-                    <div class="time-display-overlay" id="timeDisplay">00:05</div>
+                    <div class="time-display-overlay" id="timeDisplay">00:12</div>
+                    <div class="activity-title-overlay" id="activityTitle">Allongements</div>
                 </div>
-                
-                <!-- Barre de progression -->
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
-                
-                <!-- Contrôles -->
                 <div class="controls-compact">
                     <div class="main-controls">
-                        <button id="startStopBtn"
-                                class="btn start-btn main-control-row">
-                            <i class="fas fa-play"></i> Start
-                        </button>
-
+                        <button id="startStopBtn" class="btn start-btn main-control-row"><i class="fas fa-play"></i> Start</button>
                         <div class="cycle-display main-control-row">
-                            <div class="cycle-number-center"
-                                 id="cycleCountCenter">0</div>
+                            <div class="cycle-number-center" id="cycleCountCenter">0</div>
                         </div>
-
-                        <button id="resetBtn"
-                                class="btn reset-btn main-control-row" disabled>
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
+                        <button id="resetBtn" class="btn reset-btn main-control-row" disabled><i class="fas fa-redo"></i> Reset</button>
                     </div>
                 </div>
             </div>
@@ -78,99 +50,76 @@
         </footer>
     </div>
 
-    <!-- PANNEAU LATÉRAL MENU HAMBURGER -->
+    <!-- MENU HAMBURGER -->
     <nav id="burger-menu" aria-hidden="true">
-        <!-- 1. Temps de préparation (VERT) -->
         <section class="menu-section">
-            <label class="time-label prepa-label" for="secondes_prepa">
-                Temps de préparation / récupération
-            </label>
-            <input type="range" id="secondes_prepa"
-                   min="0" max="60" value="5" step="1" 
-                   class="slider prepa-slider">
-            <span class="value-display prepa-value" id="secondesPrepaValue">5</span>
-        </section>
-
-        <!-- Sonneries PRÉPA -->
-        <section class="menu-section">
-            <div class="ringtones-grid" id="prepaRingtonesContainer">
-                <!-- Rempli par JS -->
+            <div class="mode-toggle-group">
+                <button id="modeChronoBtn" class="mode-btn active">⏱️ Chrono</button>
+                <button id="modeCompteurBtn" class="mode-btn">🔁 Compteur</button>
             </div>
         </section>
 
         <section class="menu-section">
-            <h3 class="cycle-title">Exercice</h3>
-            <div class="time-controls">
-                <div class="time-selector-compact">
-                    <input type="range" id="seconds"
-                           min="1" max="300" value="5" class="slider cycle-slider">
-                    <span class="value-display cycle-value" id="secondsValue">5</span>
-                </div>
+            <label class="time-label prepa-label" for="secondes_prepa">Temps de préparation / récupération (sec)</label>
+            <input type="range" id="secondes_prepa" min="1" max="30" value="12" step="1" class="slider prepa-slider">
+            <span class="value-display prepa-value" id="secondesPrepaValue">12</span>
+        </section>
+
+        <section class="menu-section" id="workSliderContainer">
+            <div id="chronoWorkDiv" class="work-slider-container">
+                <label class="time-label cycle-title" for="seconds">Durée exercice (secondes)</label>
+                <input type="range" id="seconds" min="1" max="300" value="5" step="1" class="slider cycle-slider">
+                <span class="value-display cycle-value" id="secondsValue">5</span>
+            </div>
+            <div id="counterWorkDiv" class="work-slider-container" style="display:none;">
+                <label class="time-label cycle-title" for="repsTarget">Compteur exercice (répétitions)</label>
+                <input type="range" id="repsTarget" min="1" max="60" value="22" step="1" class="slider cycle-slider">
+                <span class="value-display cycle-value" id="repsValue">22</span>
             </div>
         </section>
 
-        <!-- 2. Sonneries (6, sans icônes) -->
-        <section class="menu-section">
-            <div class="ringtones-grid" id="ringtonesContainer">
-                <!-- Rempli par JS -->
-            </div>
-        </section>
-
-        <!-- 3. Choix d'activité -->
         <section class="menu-section">
             <h3>Activité</h3>
             <select id="activity-select" class="activity-select">
                 <option value="allonge">Allongements</option>
                 <option value="gainage">Gainage</option>
                 <option value="ballon">Ballon</option>
+                <option value="abdo">Abdo</option>
             </select>
         </section>
 
-        <!-- 4. Réglages : veille / vibration -->
         <section class="menu-section">
             <h3>Réglages</h3>
             <div class="settings-compact">
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="wakeLock" checked>
-                        <span class="setting-text">Empêcher la mise en veille</span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" id="vibrate" checked>
-                        <span class="setting-text">Vibrations</span>
-                    </label>
-                </div>
+                <div class="setting-item"><label><input type="checkbox" id="wakeLock" checked> <span class="setting-text">Empêcher mise en veille</span></label></div>
+                <div class="setting-item"><label><input type="checkbox" id="vibrate" checked> <span class="setting-text">Vibrations</span></label></div>
+                <div class="setting-item"><label><input type="checkbox" id="screenLock"> <span class="setting-text">Verrouillage écran (9:16)</span></label></div>
+            </div>
+            <div class="sensitivity-item">
+                <label>Sensibilité compteur <span id="sensitivityValue">2.0</span></label>
+                <input type="range" id="sensitivitySlider" min="0.5" max="10" step="0.1" value="2.0">
             </div>
         </section>
 
-        <!-- 5. Texte d'information -->
+        <section class="menu-section">
+            <h3 style="color:#81C784">🔔 Sonnerie PRÉPA (vert)</h3>
+            <div class="ringtones-grid" id="prepaRingtonesContainer"></div>
+        </section>
+        <section class="menu-section">
+            <h3 style="color:#F44336">🔔 Sonnerie EXERCICE (rouge)</h3>
+            <div class="ringtones-grid" id="ringtonesContainer"></div>
+        </section>
+
         <section class="menu-section">
             <h3>À propos</h3>
-            <p>
-                Alarme Répétitive © 2026 - Asde Coeur. <br>
-                Compte à rebours répétitif comme un sablier, avec temps de
-                préparation et cycles d'activité.
-            </p>
-            <p>
-                Réglez le temps de préparation (vert) puis la durée du cycle
-                (rouge). Le temps de préparation/ récupération en vert va en décroissant, puis le
-                cycle de travail rouge à son tour.
-            </p>
-            <p>	
-                Cet outil a été créé afin de garder les mains libres durant vos entraînements. Il fonctionne sur tous les appareils et ne nécessite aucune installation
-            </p>
-            <p>
-                Si vous désirez une animation personalisée (dans les activités), abonnez vous à chaine Youtube et je vous fais cela!!!
-            </p>
+            <p>Alarme Répétitive © 2026 - Asde Coeur. Chrono ou compteur à mouvements (accéléromètre).<br>
+            Mode compteur : chaque mouvement vertical (Z) déclenche une répétition + son "zouin.wav".<br>
+            Sensibilité réglable. Préparation en vert, comptage en rouge. Avec la 4° version le mode Compteur ne peut fonctionner que sur les appareils disposant d’un accéléromètre.</p>
         </section>
     </nav>
 
-    <!-- Audio -->
-    <audio id="alarmSound" preload="auto">
-        <source src="Sonneries/sonnerie1.wav" type="audio/wav">
-    </audio>
+    <audio id="alarmSound" preload="auto"><source src="Sonneries/sonnerie1.wav" type="audio/wav"></audio>
+    <audio id="zouinSound" preload="auto"><source src="Sonneries/zouin.wav" type="audio/wav"></audio>
 
     <script src="script.js"></script>
 </body>
