@@ -1,3 +1,18 @@
+Avec la 4° version le mode Compteur ne peut fonctionner que sur les appareils disposant sd’un accéléromètre.
+/ (racine)
+├── index.html
+├── style.css
+├── script.js
+├── Images/
+│   ├── logo.png
+│   ├── allonge/
+│   │   └── serie1.png … serie10.png
+│   ├── gainage/
+│   ├── ballon/
+│   └── Abdo/
+└── Sonneries/
+    ├── sonnerie1.wav … sonnerie6.wav
+
 Comme je n'ai pas trouvé d'appli Android avec un chrono inférieur à la minute. J'ai tout simplement demandé à Grok avec cette phrase.
 On peut démarrer avec un index, un style.css et un script.js. Comme il s’agit d’un site à créer, Appelons le Alarme Répétitive par Asde Coeur. 
 Je veux une présentation RWD.
