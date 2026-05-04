@@ -54,7 +54,9 @@ const SERIES = {
     allonge: { folder: 'Images/allonge', maxImages: 10 },
     gainage: { folder: 'Images/gainage', maxImages: 10 },
     ballon: { folder: 'Images/ballon', maxImages: 10 },
-    abdo: { folder: 'Images/Abdo', maxImages: 10 }
+    abdo: { folder: 'Images/Abdo', maxImages: 10 },
+	chaise: { folder: 'Images/chaise', maxImages: 10 },
+	decompte: { folder: 'Images/comptage', maxImages: 10 }	
 };
 let currentSeries = 'allonge';
 
@@ -337,7 +339,7 @@ function handleScreenLock() {
 
 // ========== SONNERIES UI ==========
 function createRingtoneButtons() {
-    const numbers = [1,2,3,4,5,6];
+    const numbers = [1,2,3,4,5,6,7,8];
     ringtonesContainer.innerHTML = '';
     numbers.forEach(n=>{
         const btn = document.createElement('button');
@@ -358,7 +360,7 @@ function createRingtoneButtons() {
 }
 
 function createPrepaRingtoneButtons() {
-    const numbers = [1,2,3,4,5,6];
+    const numbers = [1,2,3,4,5,6,7,8];
     prepaRingtonesContainer.innerHTML = '';
     numbers.forEach(n=>{
         const btn = document.createElement('button');
@@ -376,23 +378,89 @@ function createPrepaRingtoneButtons() {
     });
 }
 
-// ========== ÉVÉNEMENTS & INIT ==========
+// ======
 function setupListeners() {
+    // Sliders
     prepaSlider.addEventListener('input', updateTimeFromSliders);
     secondsSlider.addEventListener('input', updateTimeFromSliders);
     repsSlider.addEventListener('input', updateTimeFromSliders);
-    startStopBtn.addEventListener('click', ()=> isRunning ? stopTimer() : startTimer());
+
+    // Boutons principaux
+    startStopBtn.addEventListener('click', () => isRunning ? stopTimer() : startTimer());
     resetBtn.addEventListener('click', resetTimer);
-    document.getElementById('burger-btn').addEventListener('click',()=>document.getElementById('burger-menu').classList.toggle('open'));
-    document.addEventListener('click',(e)=>{ if(!document.getElementById('burger-menu').contains(e.target) && !document.getElementById('burger-btn').contains(e.target)) document.getElementById('burger-menu').classList.remove('open'); });
-    wakeLockCheckbox.addEventListener('change',(e)=>{ wakeLockEnabled=e.target.checked; if(!wakeLockEnabled && wakeLockObj) releaseWakeLock(); else if(wakeLockEnabled && isRunning) requestWakeLock(); });
-    vibrateCheckbox.addEventListener('change',(e)=>{ vibrateEnabled=e.target.checked; });
+
+    // === MENU HAMBURGER (corrigé) ===
+    const burgerBtn = document.getElementById('burger-btn');
+    const burgerMenu = document.getElementById('burger-menu');
+
+    if (burgerBtn && burgerMenu) {
+        burgerBtn.addEventListener('click', (e) => {
+            e.stopImmediatePropagation();
+            burgerMenu.classList.toggle('open');
+        });
+
+        // Fermeture en cliquant en dehors
+        document.addEventListener('click', (e) => {
+            if (!burgerMenu.contains(e.target) && !burgerBtn.contains(e.target)) {
+                burgerMenu.classList.remove('open');
+            }
+        });
+    }
+
+    // Autres listeners
+    wakeLockCheckbox.addEventListener('change', (e) => {
+        wakeLockEnabled = e.target.checked;
+        if (!wakeLockEnabled && wakeLockObj) releaseWakeLock();
+        else if (wakeLockEnabled && isRunning) requestWakeLock();
+    });
+
+    vibrateCheckbox.addEventListener('change', (e) => {
+        vibrateEnabled = e.target.checked;
+    });
+
     screenLockCheckbox.addEventListener('change', handleScreenLock);
-    modeChronoBtn.addEventListener('click',()=>{ if(currentMode==='compteur'){ currentMode='chrono'; if(isRunning) stopTimer(); updateModeUI(); updateDisplay(); resetAccelerometerListener(); } });
-    modeCompteurBtn.addEventListener('click',()=>{ if(currentMode==='chrono'){ currentMode='compteur'; if(isRunning) stopTimer(); updateModeUI(); updateDisplay(); resetAccelerometerListener(); } });
-    activitySelect.addEventListener('change',()=>{ currentSeries = activitySelect.value; cycles=0; updateBackgroundForCycle(); if(!isRunning) updateDisplay(); });
-    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && isRunning && wakeLockEnabled && 'wakeLock' in navigator) requestWakeLock(); });
-    sensitivitySlider.addEventListener('input',()=>{ sensitivity = parseFloat(sensitivitySlider.value); sensitivityValueSpan.textContent = sensitivity.toFixed(1); });
+
+    // Changement de mode
+    modeChronoBtn.addEventListener('click', () => {
+        if (currentMode === 'compteur') {
+            currentMode = 'chrono';
+            if (isRunning) stopTimer();
+            updateModeUI();
+            updateDisplay();
+            resetAccelerometerListener();
+        }
+    });
+
+    modeCompteurBtn.addEventListener('click', () => {
+        if (currentMode === 'chrono') {
+            currentMode = 'compteur';
+            if (isRunning) stopTimer();
+            updateModeUI();
+            updateDisplay();
+            resetAccelerometerListener();
+        }
+    });
+
+    // Activité
+    activitySelect.addEventListener('change', () => {
+        currentSeries = activitySelect.value;
+        cycles = 0;
+        updateBackgroundForCycle();
+        if (!isRunning) updateDisplay();
+    });
+
+    // Visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && isRunning && wakeLockEnabled && 'wakeLock' in navigator) {
+            requestWakeLock();
+        }
+    });
+
+    // Sensibilité
+    sensitivitySlider.addEventListener('input', () => {
+        sensitivity = parseFloat(sensitivitySlider.value);
+        sensitivityValueSpan.textContent = sensitivity.toFixed(1);
+    });
 }
 
 function init() {
