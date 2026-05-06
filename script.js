@@ -1,10 +1,10 @@
 // Variables globales
 let timerInterval = null;
 let prepaSeconds = 12;
-let workSeconds = 5;
-let workRepsTarget = 22;
+let workSeconds = 22;      // durée exercice en mode chrono
+let workRepsTarget = 10;   // décompte en mode compteur (initialisé à 10)
 let currentPrepa = 12;
-let currentWork = 5;
+let currentWork = 22;
 let isRunning = false;
 let cycles = 0;
 let selectedRingtone = 'sonnerie1.wav';
@@ -37,7 +37,6 @@ const resetBtn = document.getElementById('resetBtn');
 const ringtonesContainer = document.getElementById('ringtonesContainer');
 const prepaRingtonesContainer = document.getElementById('prepaRingtonesContainer');
 const alarmSound = document.getElementById('alarmSound');
-const zouinSound = document.getElementById('zouinSound');
 const wakeLockCheckbox = document.getElementById('wakeLock');
 const vibrateCheckbox = document.getElementById('vibrate');
 const screenLockCheckbox = document.getElementById('screenLock');
@@ -55,33 +54,91 @@ const SERIES = {
     gainage: { folder: 'Images/gainage', maxImages: 10 },
     ballon: { folder: 'Images/ballon', maxImages: 10 },
     abdo: { folder: 'Images/Abdo', maxImages: 10 },
-	chaise: { folder: 'Images/chaise', maxImages: 10 },
-	decompte: { folder: 'Images/comptage', maxImages: 10 }	
+    chaise: { folder: 'Images/chaise', maxImages: 10 },
+    decompte: { folder: 'Images/comptage', maxImages: 10 }
 };
 let currentSeries = 'allonge';
 
-// ========== FONCTIONS D'INTERFACE ==========
-function updateModeUI() {
-    const isChrono = (currentMode === 'chrono');
-    document.body.classList.toggle('mode-chrono', isChrono);
-    document.body.classList.toggle('mode-compteur', !isChrono);
-    if (isChrono) {
-        chronoWorkDiv.style.display = 'block';
-        counterWorkDiv.style.display = 'none';
-        modeChronoBtn.classList.add('active');
-        modeCompteurBtn.classList.remove('active');
-        if (!isRunning) currentWork = workSeconds;
-    } else {
-        chronoWorkDiv.style.display = 'none';
-        counterWorkDiv.style.display = 'block';
-        modeChronoBtn.classList.remove('active');
-        modeCompteurBtn.classList.add('active');
-        if (!isRunning) currentWork = workRepsTarget;
-    }
-    updateDisplay();
-    resetAccelerometerListener();
+// --- SON POUR LE COMPTEUR (utilise la sonnerie verte) ---
+function playCompteurTick() {
+    let url = `Sonneries/${selectedPrepaRingtone}`;
+    let snd = new Audio(url);
+    snd.volume = 0.5;
+    snd.play().catch(e => console.log("son compteur erreur", e));
+    if (vibrateEnabled && 'vibrate' in navigator) navigator.vibrate(80);
 }
 
+// --- Réinitialisation des sliders selon le mode actuel ---
+function resetToCurrentModeDefaults() {
+    if (currentMode === 'chrono') {
+        prepaSlider.value = 12;
+        secondsSlider.value = 22;
+        repsSlider.value = 0;
+        prepaSlider.disabled = false;
+        secondsSlider.disabled = false;
+        repsSlider.disabled = true;
+    } else {
+        prepaSlider.value = 0;
+        secondsSlider.value = 0;
+        repsSlider.value = 10;
+        prepaSlider.disabled = true;
+        secondsSlider.disabled = true;
+        repsSlider.disabled = false;
+    }
+    prepaValue.textContent = prepaSlider.value;
+    secondsValue.textContent = secondsSlider.value;
+    repsValue.textContent = repsSlider.value;
+    updateTimeFromSliders();
+}
+
+// --- Mise à jour de l'interface lors du changement de mode ---
+function applyModePreset() {
+    if (currentMode === 'chrono') {
+        prepaSlider.disabled = false;
+        secondsSlider.disabled = false;
+        repsSlider.disabled = true;
+        prepaSlider.value = 12;
+        secondsSlider.value = 22;
+        repsSlider.value = 0;
+    } else {
+        prepaSlider.disabled = true;
+        secondsSlider.disabled = true;
+        repsSlider.disabled = false;
+        prepaSlider.value = 0;
+        secondsSlider.value = 0;
+        repsSlider.value = 10;
+    }
+    prepaValue.textContent = prepaSlider.value;
+    secondsValue.textContent = secondsSlider.value;
+    repsValue.textContent = repsSlider.value;
+    updateTimeFromSliders();
+    if (isRunning) stopTimer();
+    resetTimer();
+}
+
+// --- Gestion du verrouillage d'orientation ---
+let screenLockAttempted = false;
+function handleScreenLock() {
+    if (screenLockCheckbox.checked) {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait-primary').catch(err => {
+                console.log("Orientation lock non autorisée:", err);
+            });
+        }
+    } else {
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    }
+}
+function attemptScreenLockOnUserAction() {
+    if (!screenLockAttempted && screenLockCheckbox.checked) {
+        handleScreenLock();
+        screenLockAttempted = true;
+    }
+}
+
+// --- Affichage principal ---
 function updateDisplay() {
     const remaining = (phase === 'prepa') ? currentPrepa : currentWork;
     if (phase === 'prepa' || (phase === 'work' && currentMode === 'chrono')) {
@@ -151,13 +208,8 @@ function triggerSuccess() {
 }
 
 function playPrepaEndSound() { playSound(`Sonneries/${selectedPrepaRingtone}`,0.7); }
-function playZouin() { 
-    zouinSound.currentTime = 0;
-    zouinSound.play().catch(e=>console.log);
-    if(vibrateEnabled && 'vibrate' in navigator) navigator.vibrate(80);
-}
 
-// ========== ACCÉLÉROMÈTRE (COMPTEUR) ==========
+// --- ACCÉLÉROMÈTRE (COMPTEUR) ---
 function initAccelerometerListener() {
     if (deviceMotionHandler) window.removeEventListener('devicemotion', deviceMotionHandler);
     if (currentMode !== 'compteur') return;
@@ -175,7 +227,7 @@ function initAccelerometerListener() {
                 lastMoveTime = now;
                 if (currentWork > 0) {
                     currentWork--;
-                    playZouin();
+                    playCompteurTick();   // son vert à chaque mouvement
                     updateDisplay();
                     if (currentWork === 0) {
                         triggerSuccess();
@@ -206,7 +258,7 @@ function resetAccelerometerListener() {
     if (currentMode === 'compteur' && isRunning && phase === 'work') initAccelerometerListener();
 }
 
-// ========== TIMER (CHRONO SECONDE) ==========
+// --- TIMER (CHRONO SECONDE) ---
 function updateTimer() {
     if (!isRunning) return;
     if (phase === 'prepa') {
@@ -243,7 +295,7 @@ function updateTimer() {
     updateDisplay();
 }
 
-// ========== START / STOP / RESET ==========
+// --- START / STOP / RESET ---
 async function startTimer() {
     if (isRunning) return;
     updateTimeFromSliders();
@@ -267,6 +319,7 @@ async function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => updateTimer(), 1000);
     updateDisplay();
+    attemptScreenLockOnUserAction();  // tentative verrouillage écran
 }
 
 function stopTimer() {
@@ -277,9 +330,16 @@ function stopTimer() {
     startStopBtn.classList.remove('stop-btn');
     startStopBtn.classList.add('start-btn');
     releaseWakeLock();
-    prepaSlider.disabled = false;
-    secondsSlider.disabled = false;
-    repsSlider.disabled = false;
+    // Restaurer l'état disabled des sliders selon le mode
+    if (currentMode === 'chrono') {
+        prepaSlider.disabled = false;
+        secondsSlider.disabled = false;
+        repsSlider.disabled = true;
+    } else {
+        prepaSlider.disabled = true;
+        secondsSlider.disabled = true;
+        repsSlider.disabled = false;
+    }
     alarmSound.pause();
     alarmSound.currentTime = 0;
     phase = 'idle';
@@ -291,14 +351,11 @@ function resetTimer() {
     if (isRunning) stopTimer();
     cycles = 0;
     phase = 'idle';
-    updateTimeFromSliders();
-    if (currentMode === 'chrono') currentWork = workSeconds;
-    else currentWork = workRepsTarget;
-    currentPrepa = prepaSeconds;
+    resetToCurrentModeDefaults();
     updateBackgroundForCycle();
-    resetBtn.disabled = (prepaSeconds===0 || ((currentMode==='chrono' && workSeconds===0)||(currentMode==='compteur' && workRepsTarget===0)));
     updateDisplay();
     timeDisplay.classList.remove('success-active');
+    resetBtn.disabled = false;
 }
 
 function updateTimeFromSliders() {
@@ -314,7 +371,7 @@ function updateTimeFromSliders() {
         else currentWork = workRepsTarget;
     }
     updateDisplay();
-    resetBtn.disabled = (prepaSeconds===0 || ((currentMode==='chrono' && workSeconds===0)||(currentMode==='compteur' && workRepsTarget===0)));
+    resetBtn.disabled = (prepaSeconds===0 && ((currentMode==='chrono' && workSeconds===0)||(currentMode==='compteur' && workRepsTarget===0)));
 }
 
 function updateBackgroundForCycle() {
@@ -326,18 +383,11 @@ function updateBackgroundForCycle() {
     activityTitleSpan.textContent = activitySelect.options[activitySelect.selectedIndex]?.text || "Activité";
 }
 
-// ========== WAKE LOCK & ORIENTATION ==========
+// --- WAKE LOCK & ORIENTATION ---
 async function requestWakeLock() { if(wakeLockEnabled && 'wakeLock' in navigator) { try { wakeLockObj = await navigator.wakeLock.request('screen'); } catch(e){} } }
 function releaseWakeLock() { if(wakeLockObj) { wakeLockObj.release().then(()=>wakeLockObj=null); } }
-function handleScreenLock() {
-    if(screenLockCheckbox.checked) {
-        if(screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait-primary').catch(e=>console.log);
-    } else {
-        if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-    }
-}
 
-// ========== SONNERIES UI ==========
+// --- SONNERIES UI ---
 function createRingtoneButtons() {
     const numbers = [1,2,3,4,5,6,7,8];
     ringtonesContainer.innerHTML = '';
@@ -378,28 +428,22 @@ function createPrepaRingtoneButtons() {
     });
 }
 
-// ======
+// --- ÉCOUTEURS ---
 function setupListeners() {
-    // Sliders
     prepaSlider.addEventListener('input', updateTimeFromSliders);
     secondsSlider.addEventListener('input', updateTimeFromSliders);
     repsSlider.addEventListener('input', updateTimeFromSliders);
-
-    // Boutons principaux
     startStopBtn.addEventListener('click', () => isRunning ? stopTimer() : startTimer());
     resetBtn.addEventListener('click', resetTimer);
 
-    // === MENU HAMBURGER (corrigé) ===
+    // Menu hamburger
     const burgerBtn = document.getElementById('burger-btn');
     const burgerMenu = document.getElementById('burger-menu');
-
     if (burgerBtn && burgerMenu) {
         burgerBtn.addEventListener('click', (e) => {
             e.stopImmediatePropagation();
             burgerMenu.classList.toggle('open');
         });
-
-        // Fermeture en cliquant en dehors
         document.addEventListener('click', (e) => {
             if (!burgerMenu.contains(e.target) && !burgerBtn.contains(e.target)) {
                 burgerMenu.classList.remove('open');
@@ -407,41 +451,32 @@ function setupListeners() {
         });
     }
 
-    // Autres listeners
     wakeLockCheckbox.addEventListener('change', (e) => {
         wakeLockEnabled = e.target.checked;
         if (!wakeLockEnabled && wakeLockObj) releaseWakeLock();
         else if (wakeLockEnabled && isRunning) requestWakeLock();
     });
-
-    vibrateCheckbox.addEventListener('change', (e) => {
-        vibrateEnabled = e.target.checked;
-    });
-
+    vibrateCheckbox.addEventListener('change', (e) => { vibrateEnabled = e.target.checked; });
     screenLockCheckbox.addEventListener('change', handleScreenLock);
 
     // Changement de mode
     modeChronoBtn.addEventListener('click', () => {
-        if (currentMode === 'compteur') {
+        if (currentMode !== 'chrono') {
             currentMode = 'chrono';
-            if (isRunning) stopTimer();
+            applyModePreset();
             updateModeUI();
-            updateDisplay();
             resetAccelerometerListener();
         }
     });
-
     modeCompteurBtn.addEventListener('click', () => {
-        if (currentMode === 'chrono') {
+        if (currentMode !== 'compteur') {
             currentMode = 'compteur';
-            if (isRunning) stopTimer();
+            applyModePreset();
             updateModeUI();
-            updateDisplay();
             resetAccelerometerListener();
         }
     });
 
-    // Activité
     activitySelect.addEventListener('change', () => {
         currentSeries = activitySelect.value;
         cycles = 0;
@@ -449,35 +484,63 @@ function setupListeners() {
         if (!isRunning) updateDisplay();
     });
 
-    // Visibility change
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && isRunning && wakeLockEnabled && 'wakeLock' in navigator) {
             requestWakeLock();
         }
     });
 
-    // Sensibilité
     sensitivitySlider.addEventListener('input', () => {
         sensitivity = parseFloat(sensitivitySlider.value);
         sensitivityValueSpan.textContent = sensitivity.toFixed(1);
     });
+    // Son au relâchement du curseur
+    sensitivitySlider.addEventListener('change', () => {
+        let url = `Sonneries/${selectedPrepaRingtone}`;
+        let snd = new Audio(url);
+        snd.volume = 0.3;
+        snd.play().catch(e=>console.log);
+    });
 }
 
+function updateModeUI() {
+    const isChrono = (currentMode === 'chrono');
+    document.body.classList.toggle('mode-chrono', isChrono);
+    document.body.classList.toggle('mode-compteur', !isChrono);
+    if (isChrono) {
+        chronoWorkDiv.style.display = 'block';
+        counterWorkDiv.style.display = 'none';
+        modeChronoBtn.classList.add('active');
+        modeCompteurBtn.classList.remove('active');
+        if (!isRunning) currentWork = workSeconds;
+    } else {
+        chronoWorkDiv.style.display = 'none';
+        counterWorkDiv.style.display = 'block';
+        modeChronoBtn.classList.remove('active');
+        modeCompteurBtn.classList.add('active');
+        if (!isRunning) currentWork = workRepsTarget;
+    }
+    updateDisplay();
+    resetAccelerometerListener();
+}
+
+// --- INITIALISATION ---
 function init() {
     createPrepaRingtoneButtons();
     createRingtoneButtons();
-    prepaSlider.value = 12; prepaSlider.max=30; prepaSlider.step=1;
-    secondsSlider.value = 5; secondsSlider.max=300;
-    repsSlider.value = 22; repsSlider.max=60;
-    updateTimeFromSliders();
+    currentMode = 'chrono';
+    resetToCurrentModeDefaults();   // prépa=12, exercice=22, décompte=0 désactivé
     setupListeners();
     document.getElementById('currentYear').textContent = new Date().getFullYear();
     updateBackgroundForCycle();
     updateModeUI();
     sensitivity = parseFloat(sensitivitySlider.value);
     sensitivityValueSpan.textContent = sensitivity;
-    if('wakeLock' in navigator) wakeLockCheckbox.disabled=false;
-    else wakeLockCheckbox.disabled=true;
+    if ('wakeLock' in navigator) wakeLockCheckbox.disabled = false;
+    else wakeLockCheckbox.disabled = true;
+    // La case screenLock est déjà cochée dans le HTML, on attend l'action utilisateur
+    screenLockCheckbox.checked = true;
+    screenLockAttempted = false; // ne pas verrouiller avant un start
 }
 
 init();
