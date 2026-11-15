@@ -1,3 +1,6 @@
+Mon projet Alarme répétitive se voit amélioré avec un compteur. Ce compte à rebours original va pouvoir vous soulager lors d’exercices quels qu’il soient en effet, ce sont les mouvement et non le temps qui sera décrémenté depuis la quantité que vous aurez réglée.
+Voici donc une nouvelle version, (elle est ici) qui vous propose tout plein d’activité sans jamais plus vous ennuyer avec vos envies de vagabondages intellectuels. Timing ou comptage seront remplacés par les sonneries de votre choix. 
+Vos remises en forme, votre maintien enfin libérés mentalement. C’est gratuit et si des améliorations se font jour, vous n’aurez rien à faire. Pas de pub, rien, je ferai juste un changement de couleur de fond lorsque j’aurai  fait une amélioration.
 Avec la 4° version le mode Compteur ne peut fonctionner que sur les appareils disposant sd’un accéléromètre.
 / (racine)
 ├── index.html
