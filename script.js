@@ -9,6 +9,9 @@ let isRunning = false;
 let cycles = 0;
 let selectedRingtone = 'sonnerie1.wav';
 let selectedPrepaRingtone = 'sonnerie4.wav';
+// Lecteur persistant pour la sonnerie verte
+const prepaSoundPlayer = new Audio();
+prepaSoundPlayer.preload = 'auto';
 let wakeLockObj = null;
 let wakeLockEnabled = true;
 let vibrateEnabled = true;
@@ -17,8 +20,10 @@ let currentMode = 'chrono';
 
 // Accéléromètre
 let accelerometerActive = false;
-let lastZ = null;
+let lastAcceleration = null;
+let smoothedVariation = 0;
 let lastMoveTime = 0;
+let imageIndex = 0;
 let sensitivity = 2.0;
 let deviceMotionHandler = null;
 
@@ -42,12 +47,19 @@ const vibrateCheckbox = document.getElementById('vibrate');
 const screenLockCheckbox = document.getElementById('screenLock');
 const sensitivitySlider = document.getElementById('sensitivitySlider');
 const sensitivityValueSpan = document.getElementById('sensitivityValue');
+const prepSliderSection = document.getElementById('prepSliderSection');
+const sensitivityItem = document.getElementById('sensitivityItem');
+const activitySection = document.getElementById('activitySection');
+const exerciseRingtonesSection = document.getElementById('exerciseRingtonesSection');
+const cycleDisplay = document.getElementById('cycleDisplay');
+const settingsCompact = document.querySelector('.settings-compact');
 const modeChronoBtn = document.getElementById('modeChronoBtn');
 const modeCompteurBtn = document.getElementById('modeCompteurBtn');
 const chronoWorkDiv = document.getElementById('chronoWorkDiv');
 const counterWorkDiv = document.getElementById('counterWorkDiv');
 const activitySelect = document.getElementById('activity-select');
 const activityTitleSpan = document.getElementById('activityTitle');
+const burgerMenu = document.getElementById('burger-menu');
 
 const SERIES = {
     allonge: { folder: 'Images/allonge', maxImages: 10 },
@@ -58,10 +70,11 @@ const SERIES = {
     decompte: { folder: 'Images/comptage', maxImages: 10 }
 };
 let currentSeries = 'allonge';
+let lastChronoSeries = 'allonge';
 
-// --- SON POUR LE COMPTEUR (utilise la sonnerie verte) ---
+// --- SON POUR LE COMPTEUR ---
 function playCompteurTick() {
-    let url = `Sonneries/${selectedPrepaRingtone}`;
+    let url = `Sonneries/${selectedRingtone}`;
     let snd = new Audio(url);
     snd.volume = 0.5;
     snd.play().catch(e => console.log("son compteur erreur", e));
@@ -71,19 +84,15 @@ function playCompteurTick() {
 // --- Réinitialisation des sliders selon le mode actuel ---
 function resetToCurrentModeDefaults() {
     if (currentMode === 'chrono') {
-        prepaSlider.value = 12;
-        secondsSlider.value = 22;
-        repsSlider.value = 0;
-        prepaSlider.disabled = false;
-        secondsSlider.disabled = false;
-        repsSlider.disabled = true;
+        prepaSlider.value = 12; secondsSlider.value = 22; repsSlider.value = 0;
+        prepaSlider.disabled = false; secondsSlider.disabled = false; repsSlider.disabled = true;
     } else {
-        prepaSlider.value = 0;
-        secondsSlider.value = 0;
-        repsSlider.value = 10;
-        prepaSlider.disabled = true;
-        secondsSlider.disabled = true;
-        repsSlider.disabled = false;
+        prepaSlider.value = 0; secondsSlider.value = 0; 
+        // Conserve la valeur actuelle du slider repsSlider si elle a été modifiée par l'utilisateur, ou 10 par défaut
+        if (!repsSlider.value || repsSlider.value == 0) repsSlider.value = 10;
+        prepaSlider.disabled = true; secondsSlider.disabled = true; repsSlider.disabled = false;
+        workRepsTarget = parseInt(repsSlider.value);
+        currentWork = workRepsTarget;
     }
     prepaValue.textContent = prepaSlider.value;
     secondsValue.textContent = secondsSlider.value;
@@ -91,28 +100,24 @@ function resetToCurrentModeDefaults() {
     updateTimeFromSliders();
 }
 
-// --- Mise à jour de l'interface lors du changement de mode ---
 function applyModePreset() {
+    if (isRunning) stopTimer();
     if (currentMode === 'chrono') {
-        prepaSlider.disabled = false;
-        secondsSlider.disabled = false;
-        repsSlider.disabled = true;
-        prepaSlider.value = 12;
-        secondsSlider.value = 22;
-        repsSlider.value = 0;
+        prepaSlider.value = 12; secondsSlider.value = 22; repsSlider.value = 0;
+        prepaSlider.disabled = false; secondsSlider.disabled = false; repsSlider.disabled = true;
+        currentSeries = lastChronoSeries || 'allonge';
     } else {
-        prepaSlider.disabled = true;
-        secondsSlider.disabled = true;
-        repsSlider.disabled = false;
-        prepaSlider.value = 0;
-        secondsSlider.value = 0;
-        repsSlider.value = 10;
+        prepaSlider.value = 0; secondsSlider.value = 0; 
+        if (!repsSlider.value || repsSlider.value == 0) repsSlider.value = 10;
+        prepaSlider.disabled = true; secondsSlider.disabled = true; repsSlider.disabled = false;
+        currentSeries = 'decompte'; activitySelect.value = 'decompte'; imageIndex = 0;
+        workRepsTarget = parseInt(repsSlider.value);
+        currentWork = workRepsTarget;
     }
     prepaValue.textContent = prepaSlider.value;
     secondsValue.textContent = secondsSlider.value;
     repsValue.textContent = repsSlider.value;
     updateTimeFromSliders();
-    if (isRunning) stopTimer();
     resetTimer();
 }
 
@@ -146,7 +151,7 @@ function updateDisplay() {
         const secs = remaining % 60;
         timeDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
     } else if (phase === 'work' && currentMode === 'compteur') {
-        timeDisplay.textContent = `${remaining} reps`;
+        timeDisplay.textContent = `${remaining}`;
     } else if (phase === 'idle') {
         if (currentMode === 'chrono') {
             const total = prepaSeconds + workSeconds;
@@ -154,7 +159,7 @@ function updateDisplay() {
             const secs = total % 60;
             timeDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
         } else {
-            timeDisplay.textContent = `${prepaSeconds}s / ${workRepsTarget} reps`;
+            timeDisplay.textContent = `${currentWork}`;
         }
     }
 
@@ -166,12 +171,9 @@ function updateDisplay() {
     }
     let percent = (totalSegment > 0) ? (elapsed / totalSegment) * 100 : 0;
     progressBar.style.width = `${Math.min(100,percent)}%`;
-    cycleCountCenter.textContent = cycles;
+    cycleCountCenter.textContent = (currentMode === 'compteur') ? Math.max(0, currentWork) : cycles;
+    cycleDisplay.classList.toggle('counter-remaining', currentMode === 'compteur');
     updateCircularTimer();
-
-    if (isRunning && ((phase === 'prepa' && currentPrepa <= 3 && currentPrepa > 0) || (phase === 'work' && currentWork <= 3 && currentWork > 0 && currentMode==='chrono'))) {
-        timeDisplay.classList.add('success-active');
-    } else { timeDisplay.classList.remove('success-active'); }
 }
 
 function updateCircularTimer() {
@@ -193,13 +195,41 @@ function updateCircularTimer() {
     }
 }
 
+function initAudioEarly() {
+    alarmSound.src = `Sonneries/${selectedRingtone}`;
+    prepaSoundPlayer.src = `Sonneries/${selectedPrepaRingtone}`;
+    [alarmSound, prepaSoundPlayer].forEach((audio) => {
+        if (!audio) return;
+        const wasMuted = audio.muted;
+        audio.muted = true;
+        const attempt = audio.play();
+        if (attempt && typeof attempt.then === 'function') {
+            attempt.then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                audio.muted = wasMuted;
+            }).catch(() => { audio.muted = wasMuted; });
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.muted = wasMuted;
+        }
+    });
+}
+
 function playSound(url, volume=0.7) {
-    let snd = new Audio(url);
+    const snd = prepaSoundPlayer;
+    if (snd.src !== new URL(url, document.baseURI).href) {
+        snd.src = url;
+        snd.load();
+    }
     snd.volume = volume;
-    snd.play().catch(e=>console.log("son erreur",e));
+    snd.currentTime = 0;
+    snd.play().catch(e => console.warn('Lecture sonnerie impossible :', e));
 }
 
 function triggerSuccess() {
+    alarmSound.src = `Sonneries/${selectedRingtone}`;
     alarmSound.currentTime = 0;
     alarmSound.play().catch(e=>console.log);
     if (vibrateEnabled && 'vibrate' in navigator) navigator.vibrate([300,100,300]);
@@ -212,39 +242,66 @@ function playPrepaEndSound() { playSound(`Sonneries/${selectedPrepaRingtone}`,0.
 // --- ACCÉLÉROMÈTRE (COMPTEUR) ---
 function initAccelerometerListener() {
     if (deviceMotionHandler) window.removeEventListener('devicemotion', deviceMotionHandler);
-    if (currentMode !== 'compteur') return;
+    
+    const menuOpen = burgerMenu && burgerMenu.classList.contains('open');
+    const allowTestInMenu = (currentMode === 'compteur' && menuOpen && !isRunning);
+
+    if (currentMode !== 'compteur' || (!isRunning && !allowTestInMenu)) return;
+
+    lastAcceleration = null;
+    smoothedVariation = 0;
+
     deviceMotionHandler = (event) => {
-        if (!isRunning || phase !== 'work' || currentMode !== 'compteur') return;
-        let acc = event.accelerationIncludingGravity;
-        if (!acc) return;
-        let z = acc.z;
-        if (z === null) return;
-        if (lastZ === null) { lastZ = z; return; }
-        let delta = Math.abs(z - lastZ);
-        if (delta >= sensitivity) {
-            let now = Date.now();
-            if (now - lastMoveTime > 180) {
+        const mOpen = burgerMenu && burgerMenu.classList.contains('open');
+        const activeTest = (currentMode === 'compteur' && mOpen && !isRunning);
+        if (!activeTest && (!isRunning || phase !== 'work' || currentMode !== 'compteur')) return;
+
+        const acc = event.accelerationIncludingGravity || event.acceleration;
+        if (!acc || acc.x == null || acc.y == null || acc.z == null) return;
+        const current = { x: acc.x, y: acc.y, z: acc.z };
+        if (!lastAcceleration) { lastAcceleration = current; return; }
+
+        const variation = Math.max(
+            Math.abs(current.x - lastAcceleration.x),
+            Math.abs(current.y - lastAcceleration.y),
+            Math.abs(current.z - lastAcceleration.z)
+        );
+        lastAcceleration = current;
+
+        const alpha = Math.max(0.08, Math.min(0.67, 1 / (1 + sensitivity)));
+        smoothedVariation = alpha * variation + (1 - alpha) * smoothedVariation;
+
+        if (smoothedVariation >= sensitivity) {
+            const now = Date.now();
+            if (now - lastMoveTime > 700) {
                 lastMoveTime = now;
-                if (currentWork > 0) {
-                    currentWork--;
-                    playCompteurTick();   // son vert à chaque mouvement
-                    updateDisplay();
-                    if (currentWork === 0) {
-                        triggerSuccess();
-                        cycles++;
-                        updateBackgroundForCycle();
-                        currentPrepa = prepaSeconds;
-                        currentWork = (currentMode === 'chrono') ? workSeconds : workRepsTarget;
-                        phase = (prepaSeconds > 0) ? 'prepa' : 'work';
-                        updateDisplay();
-                        if (phase === 'work' && currentMode === 'compteur') resetAccelerometerListener();
+                
+                if (activeTest) {
+                    if (currentWork > 0) {
+                        currentWork--;
                     } else {
+                        currentWork = workRepsTarget;
+                    }
+                    imageIndex = (imageIndex % 10) + 1;
+                    updateCounterImage();
+                    updateDisplay();
+                    triggerSuccess();
+                } else if (isRunning && phase === 'work' && currentWork > 0) {
+                    currentWork--;
+                    imageIndex = (imageIndex % 10) + 1;
+                    updateCounterImage();
+                    updateDisplay();
+                    triggerSuccess();
+
+                    if (currentWork === 0) {
+                        playPrepaEndSound(); 
+                        cycles++;
                         updateDisplay();
+                        stopTimer();
                     }
                 }
             }
         }
-        lastZ = z;
     };
     window.addEventListener('devicemotion', deviceMotionHandler);
 }
@@ -254,11 +311,11 @@ function resetAccelerometerListener() {
         window.removeEventListener('devicemotion', deviceMotionHandler);
         deviceMotionHandler = null;
     }
-    lastZ = null;
-    if (currentMode === 'compteur' && isRunning && phase === 'work') initAccelerometerListener();
+    lastAcceleration = null;
+    initAccelerometerListener();
 }
 
-// --- TIMER (CHRONO SECONDE) ---
+// --- TIMER ---
 function updateTimer() {
     if (!isRunning) return;
     if (phase === 'prepa') {
@@ -285,9 +342,8 @@ function updateTimer() {
                 updateBackgroundForCycle();
                 currentPrepa = prepaSeconds;
                 currentWork = (currentMode === 'chrono') ? workSeconds : workRepsTarget;
-                phase = (prepaSeconds > 0) ? 'prepa' : 'work';
+                phase = (currentMode === 'chrono' && prepaSeconds > 0) ? 'prepa' : 'work';
                 updateDisplay();
-                if (currentMode === 'compteur' && phase === 'work') resetAccelerometerListener();
                 return;
             }
         }
@@ -298,10 +354,11 @@ function updateTimer() {
 // --- START / STOP / RESET ---
 async function startTimer() {
     if (isRunning) return;
+    initAudioEarly();
     updateTimeFromSliders();
     if ((currentMode==='chrono' && prepaSeconds+workSeconds===0) || (currentMode==='compteur' && prepaSeconds===0 && workRepsTarget===0)) return;
     isRunning = true;
-    phase = (prepaSeconds > 0) ? 'prepa' : 'work';
+    phase = (currentMode === 'chrono' && prepaSeconds > 0) ? 'prepa' : 'work';
     if (phase === 'prepa') { currentPrepa = prepaSeconds; }
     else { 
         if (currentMode === 'chrono') currentWork = workSeconds;
@@ -319,7 +376,7 @@ async function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => updateTimer(), 1000);
     updateDisplay();
-    attemptScreenLockOnUserAction();  // tentative verrouillage écran
+    attemptScreenLockOnUserAction();
 }
 
 function stopTimer() {
@@ -330,7 +387,6 @@ function stopTimer() {
     startStopBtn.classList.remove('stop-btn');
     startStopBtn.classList.add('start-btn');
     releaseWakeLock();
-    // Restaurer l'état disabled des sliders selon le mode
     if (currentMode === 'chrono') {
         prepaSlider.disabled = false;
         secondsSlider.disabled = false;
@@ -351,35 +407,56 @@ function resetTimer() {
     if (isRunning) stopTimer();
     cycles = 0;
     phase = 'idle';
-    resetToCurrentModeDefaults();
+    
+    // Met à jour les valeurs à partir des sliders actuels
+    updateTimeFromSliders();
+    
+    if (currentMode === 'compteur') {
+        currentWork = workRepsTarget; // Force la réinitialisation sur la valeur du slider
+    }
+    
     updateBackgroundForCycle();
     updateDisplay();
-    timeDisplay.classList.remove('success-active');
     resetBtn.disabled = false;
 }
 
 function updateTimeFromSliders() {
-    prepaSeconds = parseInt(prepaSlider.value);
+    prepaSeconds = parseInt(prepaSlider.value) || 0;
     prepaValue.textContent = prepaSeconds;
-    workSeconds = parseInt(secondsSlider.value);
+    workSeconds = parseInt(secondsSlider.value) || 0;
     secondsValue.textContent = workSeconds;
-    workRepsTarget = parseInt(repsSlider.value);
+    workRepsTarget = parseInt(repsSlider.value) || 0;
     repsValue.textContent = workRepsTarget;
+    
     if (!isRunning) {
         currentPrepa = prepaSeconds;
-        if (currentMode === 'chrono') currentWork = workSeconds;
-        else currentWork = workRepsTarget;
+        if (currentMode === 'chrono') {
+            currentWork = workSeconds;
+        } else {
+            currentWork = workRepsTarget; // Synchronise directement la valeur courante avec le slider du décompte
+        }
     }
     updateDisplay();
     resetBtn.disabled = (prepaSeconds===0 && ((currentMode==='chrono' && workSeconds===0)||(currentMode==='compteur' && workRepsTarget===0)));
 }
 
-function updateBackgroundForCycle() {
-    const config = SERIES[currentSeries] || SERIES.allonge;
-    let idx = (cycles % config.maxImages) || config.maxImages;
-    if(idx===0) idx=config.maxImages;
+function updateCounterImage() {
     const imgDiv = document.getElementById('series-image-behind');
-    if(imgDiv) imgDiv.style.backgroundImage = `url('${config.folder}/serie${idx}.png')`;
+    if (imgDiv) imgDiv.style.backgroundImage = `url('Images/comptage/serie${imageIndex}.png')`;
+}
+
+function updateBackgroundForCycle() {
+    if (currentMode === 'compteur') {
+        currentSeries = 'decompte';
+        if (imageIndex === 0) imageIndex = 1;
+        updateCounterImage();
+        activityTitleSpan.textContent = '';
+        return;
+    }
+    const config = SERIES[currentSeries] || SERIES.allonge;
+    const idx = (cycles % config.maxImages) || config.maxImages;
+    const imgDiv = document.getElementById('series-image-behind');
+    if (imgDiv) imgDiv.style.backgroundImage = `url('${config.folder}/serie${idx}.png')`;
     activityTitleSpan.textContent = activitySelect.options[activitySelect.selectedIndex]?.text || "Activité";
 }
 
@@ -432,21 +509,35 @@ function createPrepaRingtoneButtons() {
 function setupListeners() {
     prepaSlider.addEventListener('input', updateTimeFromSliders);
     secondsSlider.addEventListener('input', updateTimeFromSliders);
-    repsSlider.addEventListener('input', updateTimeFromSliders);
+    repsTarget.addEventListener('input', updateTimeFromSliders);
     startStopBtn.addEventListener('click', () => isRunning ? stopTimer() : startTimer());
     resetBtn.addEventListener('click', resetTimer);
 
     // Menu hamburger
     const burgerBtn = document.getElementById('burger-btn');
-    const burgerMenu = document.getElementById('burger-menu');
     if (burgerBtn && burgerMenu) {
         burgerBtn.addEventListener('click', (e) => {
             e.stopImmediatePropagation();
+            const willBeOpen = !burgerMenu.classList.contains('open');
             burgerMenu.classList.toggle('open');
+            if (willBeOpen) {
+                initAccelerometerListener(); 
+            } else {
+                if (currentMode === 'compteur') {
+                    currentWork = workRepsTarget;
+                    updateDisplay();
+                }
+                resetAccelerometerListener();
+            }
         });
         document.addEventListener('click', (e) => {
-            if (!burgerMenu.contains(e.target) && !burgerBtn.contains(e.target)) {
+            if (!burgerMenu.contains(e.target) && !burgerBtn.contains(e.target) && burgerMenu.classList.contains('open')) {
                 burgerMenu.classList.remove('open');
+                if (currentMode === 'compteur') {
+                    currentWork = workRepsTarget;
+                    updateDisplay();
+                }
+                resetAccelerometerListener();
             }
         });
     }
@@ -459,7 +550,6 @@ function setupListeners() {
     vibrateCheckbox.addEventListener('change', (e) => { vibrateEnabled = e.target.checked; });
     screenLockCheckbox.addEventListener('change', handleScreenLock);
 
-    // Changement de mode
     modeChronoBtn.addEventListener('click', () => {
         if (currentMode !== 'chrono') {
             currentMode = 'chrono';
@@ -479,6 +569,7 @@ function setupListeners() {
 
     activitySelect.addEventListener('change', () => {
         currentSeries = activitySelect.value;
+        if (currentSeries !== 'decompte') lastChronoSeries = currentSeries;
         cycles = 0;
         updateBackgroundForCycle();
         if (!isRunning) updateDisplay();
@@ -494,7 +585,6 @@ function setupListeners() {
         sensitivity = parseFloat(sensitivitySlider.value);
         sensitivityValueSpan.textContent = sensitivity.toFixed(1);
     });
-    // Son au relâchement du curseur
     sensitivitySlider.addEventListener('change', () => {
         let url = `Sonneries/${selectedPrepaRingtone}`;
         let snd = new Audio(url);
@@ -504,22 +594,48 @@ function setupListeners() {
 }
 
 function updateModeUI() {
-    const isChrono = (currentMode === 'chrono');
+    const isChrono = currentMode === 'chrono';
     document.body.classList.toggle('mode-chrono', isChrono);
     document.body.classList.toggle('mode-compteur', !isChrono);
-    if (isChrono) {
-        chronoWorkDiv.style.display = 'block';
-        counterWorkDiv.style.display = 'none';
-        modeChronoBtn.classList.add('active');
-        modeCompteurBtn.classList.remove('active');
-        if (!isRunning) currentWork = workSeconds;
+    chronoWorkDiv.style.display = isChrono ? 'block' : 'none';
+    counterWorkDiv.style.display = isChrono ? 'none' : 'block';
+    prepSliderSection.style.display = isChrono ? 'block' : 'none';
+    activitySection.style.display = isChrono ? 'block' : 'none';
+
+    if (!isChrono) {
+        counterWorkDiv.after(sensitivityItem);
+        sensitivityItem.style.display = 'block';
     } else {
-        chronoWorkDiv.style.display = 'none';
-        counterWorkDiv.style.display = 'block';
-        modeChronoBtn.classList.remove('active');
-        modeCompteurBtn.classList.add('active');
-        if (!isRunning) currentWork = workRepsTarget;
+        settingsCompact.appendChild(sensitivityItem);
+        sensitivityItem.style.display = 'none';
     }
+
+    exerciseRingtonesSection.style.display = 'block';
+
+    const modeInfoTitle = document.getElementById('modeInfoTitle');
+    const modeInfoText = document.getElementById('modeInfoText');
+    if (modeInfoTitle && modeInfoText) {
+        modeInfoTitle.textContent = isChrono ? 'Chrono' : 'Compteur';
+        modeInfoText.innerHTML = isChrono
+            ? '5 activités proposées, mais vous pouvez faire votre propre mix.<br>Le temps de préparation ; c’est aussi pour faire des pauses !'
+            : 'Nouveau, compte à rebours qui vous évite de compter vos exercices et compte selon vos mouvements.<br>Vous pouvez régler ce curseur avec le mouvement que vous désirez.';
+    }
+
+    modeChronoBtn.classList.toggle('active', isChrono);
+    modeCompteurBtn.classList.toggle('active', !isChrono);
+    const decompteOption = activitySelect.querySelector('option[value="decompte"]');
+    if (decompteOption) decompteOption.hidden = isChrono;
+    if (isChrono) {
+        activitySelect.value = lastChronoSeries;
+        currentSeries = lastChronoSeries;
+    } else {
+        if (activitySelect.value !== 'decompte') lastChronoSeries = activitySelect.value || lastChronoSeries;
+        currentSeries = 'decompte';
+        activitySelect.value = 'decompte';
+        imageIndex = Math.max(1, imageIndex);
+        currentWork = workRepsTarget;
+    }
+    updateBackgroundForCycle();
     updateDisplay();
     resetAccelerometerListener();
 }
@@ -529,18 +645,23 @@ function init() {
     createPrepaRingtoneButtons();
     createRingtoneButtons();
     currentMode = 'chrono';
-    resetToCurrentModeDefaults();   // prépa=12, exercice=22, décompte=0 désactivé
+    resetToCurrentModeDefaults();
     setupListeners();
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    
+    initAudioEarly();
+    window.addEventListener('pointerdown', initAudioEarly, { once: true });
+    window.addEventListener('keydown', initAudioEarly, { once: true });
+
+    const currentYearElement = document.getElementById('currentYear');
+    if (currentYearElement) currentYearElement.textContent = new Date().getFullYear();
     updateBackgroundForCycle();
     updateModeUI();
     sensitivity = parseFloat(sensitivitySlider.value);
     sensitivityValueSpan.textContent = sensitivity;
     if ('wakeLock' in navigator) wakeLockCheckbox.disabled = false;
     else wakeLockCheckbox.disabled = true;
-    // La case screenLock est déjà cochée dans le HTML, on attend l'action utilisateur
     screenLockCheckbox.checked = true;
-    screenLockAttempted = false; // ne pas verrouiller avant un start
+    screenLockAttempted = false;
 }
 
 init();
