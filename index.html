@@ -18,8 +18,20 @@
                 <button id="burger-btn" class="burger-btn" aria-label="Menu">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="alarme-text">Alarme répétitive</h1>
-                <a href="https://www.youtube.com/@jlhumez" target="_blank" rel="noopener" class="logo-container">
+                <div class="controls-compact header-controls">
+                    <div class="main-controls">
+                        <button id="startStopBtn" class="btn start-btn main-control-row">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <div class="cycle-display main-control-row" id="cycleDisplay">
+                            <div class="cycle-number-center" id="cycleCountCenter">0</div>
+                        </div>
+                        <button id="resetBtn" class="btn reset-btn main-control-row" disabled>
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/@jlhumez/playlists" target="_blank" rel="noopener" class="logo-container">
                     <img src="Images/logo.png" alt="Logo JL Humez" class="logo">
                 </a>
             </div>
@@ -30,32 +42,19 @@
                 <div class="sector-with-background">
                     <div id="series-image-behind" class="series-image-reduced"></div>
                     <div id="circular-timer" class="circular-timer-sector"></div>
-                    <div class="time-display-overlay" id="timeDisplay">00:12</div>
-                    <div class="activity-title-overlay" id="activityTitle">Allongements</div>
+                    <div class="time-display-overlay" id="timeDisplay" style="display: none;">00:12</div>
+                    <div class="activity-title-overlay" id="activityTitle" style="display: none;">Allongements</div>
                 </div>
 
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
 
-                <div class="controls-compact">
-                    <div class="main-controls">
-                        <button id="startStopBtn" class="btn start-btn main-control-row">
-                            <i class="fas fa-play"></i> Start
-                        </button>
-                        <div class="cycle-display main-control-row">
-                            <div class="cycle-number-center" id="cycleCountCenter">0</div>
-                        </div>
-                        <button id="resetBtn" class="btn reset-btn main-control-row" disabled>
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                    </div>
-                </div>
             </div>
         </main>
 
         <footer class="compact-footer">
-            <p>Alarme Répétitive © <span id="currentYear"></span> — 2 modes — 5 activités — Asde Coeur</p>
+            <p>Alarme Répétitive © 11 2026 - Asde Coeur.</p>
         </footer>
     </div>
 
@@ -68,7 +67,15 @@
             </div>
         </section>
 
-        <section class="menu-section">
+        <section class="menu-section" id="modeInfoSection">
+            <h3 id="modeInfoTitle">Chrono</h3>
+            <p id="modeInfoText">
+                5 activités proposées, mais vous pouvez faire votre propre mix.<br>
+                Le temps de préparation ; c’est aussi pour faire des pauses !
+            </p>
+        </section>
+
+        <section class="menu-section" id="prepSliderSection">
             <label class="time-label prepa-label" for="secondes_prepa">Temps de préparation / récupération (sec)</label>
             <input type="range" id="secondes_prepa" min="0" max="30" value="12" step="1" class="slider prepa-slider">
             <span class="value-display prepa-value" id="secondesPrepaValue">12</span>
@@ -88,7 +95,7 @@
             </div>
         </section>
 
-        <section class="menu-section">
+        <section class="menu-section" id="activitySection">
             <h3>Activité</h3>
             <select id="activity-select" class="activity-select">
                 <option value="allonge">Allongement</option>
@@ -96,6 +103,7 @@
                 <option value="ballon">Ballon</option>
                 <option value="abdo">Abdo</option>
                 <option value="chaise">Chaise</option>
+                <option value="decompte">Décompte</option>
             </select>
         </section>
 
@@ -106,30 +114,23 @@
                 <div class="setting-item"><label><input type="checkbox" id="vibrate" checked> <span class="setting-text">Vibrations</span></label></div>
                 <div class="setting-item"><label><input type="checkbox" id="screenLock" checked> <span class="setting-text">Verrouillage écran (9:16)</span></label></div>
             </div>
-            <div class="sensitivity-item">
+            <div class="sensitivity-item" id="sensitivityItem">
                 <label>Sensibilité compteur <span id="sensitivityValue">2.0</span></label>
-                <input type="range" id="sensitivitySlider" min="0.5" max="10" step="0.1" value="2.0">
+                <!-- Échelle 0 à 5 -->
+                <input type="range" id="sensitivitySlider" min="0" max="5" step="0.1" value="2.0">
             </div>
         </section>
 
         <section class="menu-section">
-            <h3 style="color:#81C784">🔔 Sonnerie PRÉPA (vert)</h3>
+            <h3 style="color:#81C784">🔔 Sonnerie Pause, préparation (verte)</h3>
             <div class="ringtones-grid" id="prepaRingtonesContainer"></div>
         </section>
 
-        <section class="menu-section">
-            <h3 style="color:#F44336">🔔 Sonnerie EXERCICE (rouge)</h3>
+        <section class="menu-section" id="exerciseRingtonesSection">
+            <h3 style="color:#F44336">🔔 Exercices, décompte (rouge)</h3>
             <div class="ringtones-grid" id="ringtonesContainer"></div>
         </section>
 
-        <section class="menu-section">
-            <h3>À propos</h3>
-            <p>
-                Alarme Répétitive © 06 05 2026 - Asde Coeur.<br>
-                Chrono ou compteur à mouvements (accéléromètre).<br>
-                       Sensibilité réglable.
-            </p>
-        </section>
     </nav>
 
     <audio id="alarmSound" preload="auto"><source src="Sonneries/sonnerie1.wav" type="audio/wav"></audio>
