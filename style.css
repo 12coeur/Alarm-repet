@@ -6,7 +6,6 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
     color: #fff;
     min-height: 100vh;
     margin: 0;
@@ -21,12 +20,13 @@ body {
     transition: background 0.3s ease;
 }
 
-body.mode-compteur {
-    background: linear-gradient(135deg, #2c2c2c 0%, #1e1e2a 100%);
+/* Couleurs de fond demandées */
+body.mode-chrono {
+    background: #000230 !important;
 }
 
-body.mode-chrono {
-    background: linear-gradient(135deg, #0a0a1a 0%, #15152e 100%);
+body.mode-compteur {
+    background: #300900 !important;
 }
 
 .container {
@@ -56,16 +56,6 @@ body.mode-chrono {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-}
-
-.alarme-text {
-    font-size: 1.8rem;
-    color: #4cc9f0;
-    text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
-    flex: 1;
-    text-align: right;
-    margin-right: 10px;
-    font-weight: 700;
 }
 
 .logo-container {
@@ -138,41 +128,6 @@ body.mode-chrono {
     transition: background 0.3s ease;
 }
 
-.time-display-overlay {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    font-size: 1.4rem;
-    font-weight: 800;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 4px 12px;
-    border-radius: 40px;
-    backdrop-filter: blur(4px);
-    color: #fff;
-    text-shadow: 0 0 8px #4cc9f0;
-    font-family: 'Courier New', monospace;
-    z-index: 4;
-    pointer-events: none;
-}
-
-.activity-title-overlay {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 4px 12px;
-    border-radius: 40px;
-    backdrop-filter: blur(4px);
-    z-index: 4;
-    pointer-events: none;
-    font-family: 'Segoe UI', monospace;
-    letter-spacing: 1px;
-}
-
 .progress-container {
     width: 80%;
     height: 12px;
@@ -243,21 +198,9 @@ body.mode-chrono {
     color: white;
 }
 
-.start-btn:hover {
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
 .stop-btn {
     background: linear-gradient(135deg, rgba(247, 37, 133, 0.9), rgba(181, 23, 158, 0.9));
     color: white;
-}
-
-.stop-btn:hover {
-    background: linear-gradient(135deg, rgba(181, 23, 158, 0.9), rgba(247, 37, 133, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 .reset-btn {
@@ -265,16 +208,9 @@ body.mode-chrono {
     color: white;
 }
 
-.reset-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, rgba(86, 11, 173, 0.9), rgba(114, 9, 183, 0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
 .reset-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: linear-gradient(135deg, rgba(58, 12, 163, 0.9), rgba(67, 97, 238, 0.9));
 }
 
 .cycle-display {
@@ -335,19 +271,8 @@ body.mode-chrono {
     box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
 }
 
-/* Sliders DÉSACTIVÉS (grisés) */
 .slider:disabled {
     opacity: 0.5;
-    cursor: not-allowed;
-}
-.slider:disabled::-webkit-slider-thumb {
-    background: #888 !important;
-    box-shadow: none !important;
-    cursor: not-allowed;
-}
-.slider:disabled::-moz-range-thumb {
-    background: #888 !important;
-    box-shadow: none !important;
     cursor: not-allowed;
 }
 
@@ -356,15 +281,12 @@ body.mode-chrono {
 }
 .prepa-slider::-webkit-slider-thumb {
     background: #4CAF50 !important;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.8) !important;
 }
 .prepa-slider::-moz-range-thumb {
     background: #4CAF50 !important;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.8) !important;
 }
 .prepa-value {
     color: #4CAF50 !important;
-    text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
 }
 
 .cycle-title {
@@ -372,31 +294,25 @@ body.mode-chrono {
 }
 .cycle-slider::-webkit-slider-thumb {
     background: #F44336 !important;
-    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
 }
 .cycle-slider::-moz-range-thumb {
     background: #F44336 !important;
-    box-shadow: 0 0 8px rgba(244, 67, 54, 0.8) !important;
 }
 .cycle-value {
     color: #F44336 !important;
 }
 
-/* Décompte - bleu */
 .decompte-label {
     color: #42a5f5 !important;
 }
 .decompte-slider::-webkit-slider-thumb {
     background: #42a5f5 !important;
-    box-shadow: 0 0 8px rgba(66, 165, 245, 0.8) !important;
 }
 .decompte-slider::-moz-range-thumb {
     background: #42a5f5 !important;
-    box-shadow: 0 0 8px rgba(66, 165, 245, 0.8) !important;
 }
 .decompte-value {
     color: #42a5f5 !important;
-    text-shadow: 0 0 8px rgba(66, 165, 245, 0.6);
 }
 
 .value-display {
@@ -405,7 +321,6 @@ body.mode-chrono {
     font-size: 1rem;
     font-weight: bold;
     color: #4cc9f0;
-    text-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
 }
 
 .ringtones-grid {
@@ -422,7 +337,6 @@ body.mode-chrono {
     color: #d0d0d0;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
     font-size: 0.9rem;
     font-weight: bold;
     min-height: 40px;
@@ -432,23 +346,16 @@ body.mode-chrono {
     text-align: center;
 }
 
-.ringtone-btn:hover {
-    background-color: rgba(76, 201, 240, 0.2);
-    border-color: rgba(76, 201, 240, 0.6);
-}
-
 .ringtone-btn.active {
     background: linear-gradient(135deg, rgba(67, 97, 238, 0.5), rgba(58, 12, 163, 0.5));
     border-color: #4cc9f0;
     color: #fff;
-    box-shadow: 0 0 12px rgba(76, 201, 240, 0.6);
 }
 
 .prepa-ringtone-btn.active {
     background: linear-gradient(135deg, rgba(76, 175, 80, 0.5), rgba(46, 125, 50, 0.5));
     border-color: #4CAF50;
     color: #fff;
-    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
 }
 
 .settings-compact {
@@ -456,7 +363,6 @@ body.mode-chrono {
     border-radius: 10px;
     padding: 12px;
     margin-bottom: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(67, 97, 238, 0.4);
     display: flex;
     gap: 10px;
@@ -469,12 +375,6 @@ body.mode-chrono {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.setting-item:hover {
-    background-color: rgba(76, 201, 240, 0.1);
-    border-color: rgba(76, 201, 240, 0.3);
 }
 
 .setting-item label {
@@ -492,11 +392,6 @@ body.mode-chrono {
     margin-right: 8px;
     cursor: pointer;
     accent-color: #4cc9f0;
-    flex-shrink: 0;
-}
-
-.setting-text {
-    flex-grow: 1;
 }
 
 .sensitivity-item {
@@ -572,22 +467,30 @@ body.mode-chrono {
     border-radius: 60px;
 }
 
+/* Couleurs personnalisées pour les boutons de mode */
+#modeChronoBtn {
+    background-color: #000230 !important;
+    color: #fff !important;
+}
+
+#modeCompteurBtn {
+    background-color: #300900 !important;
+    color: #fff !important;
+}
+
 .mode-btn {
     flex: 1;
-    background: rgba(255,255,255,0.1);
-    border: none;
+    border: 2px solid transparent;
     padding: 10px 0;
     border-radius: 40px;
     font-weight: bold;
     font-size: 1rem;
-    color: #eee;
     cursor: pointer;
     transition: 0.2s;
 }
 
 .mode-btn.active {
-    background: #4cc9f0;
-    color: #0a0a1a;
+    border-color: #4cc9f0;
     box-shadow: 0 0 12px #4cc9f0;
 }
 
@@ -609,44 +512,30 @@ body.mode-chrono {
     100% { box-shadow: inset 0 0 0 0 rgba(76, 201, 240, 0); }
 }
 
-.success-active {
-    animation: success-pulse 1s infinite;
-}
-
 body.success-flash {
     animation: body-flash 0.5s ease;
 }
 
-@media (max-width: 768px) {
-    body { padding: 6px; font-size: 13px; }
-    .container { padding: 10px; max-width: 80vw; }
-    .alarme-text { font-size: 1.6rem; }
-    .logo-container { width: 50px; height: 50px; }
-    .sector-with-background { width: 200px; height: 200px; margin: 15px auto; }
-    .time-display-overlay { font-size: 1.2rem; top: 6px; left: 6px; }
-    .activity-title-overlay { font-size: 1rem; top: 6px; right: 6px; }
-    .progress-container { width: 85%; }
-    .btn { font-size: 0.9rem; min-width: 80px; }
-    .cycle-number-center { font-size: 1.8rem; }
+body.mode-compteur .activity-title-overlay { display: none; }
+body.mode-compteur .series-image-reduced {
+    animation: fadeImage 1.2s ease-in-out;
 }
 
-@media (max-width: 550px) {
-    .ringtones-grid { grid-template-columns: repeat(3, 1fr); }
-}
+.compact-header { margin-bottom: 15px; padding-bottom: 10px; }
+.header-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
+.header-top .burger-btn { flex: 0 0 42px; margin: 0; padding: 9px 6px; }
+.header-controls { flex: 1 1 auto; min-width: 0; margin: 0; padding: 7px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); border-radius: 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 3px 12px rgba(0,0,0,0.16); }
+.header-controls .main-controls { gap: 5px; align-items: center; }
+.header-controls .main-control-row { height: 42px; min-width: 0; }
+.header-controls .btn { flex: 1 1 0; padding: 0 5px; font-size: 0.82rem; white-space: nowrap; }
+.header-controls .cycle-display { flex: 0 1 48px; padding: 0 4px; }
+.header-top .logo-container { flex: 0 0 48px; width: 48px; height: 48px; }
 
-@media (max-width: 480px) {
-    .container { padding: 8px; }
-    .alarme-text { font-size: 1.4rem; }
-    .logo-container { width: 45px; height: 45px; }
-    .sector-with-background { width: 180px; height: 180px; }
-    .time-display-overlay { font-size: 1rem; }
-    .activity-title-overlay { font-size: 0.9rem; }
-    .btn { font-size: 0.85rem; min-width: 70px; }
-    .cycle-number-center { font-size: 1.6rem; }
-}
-
-@media (max-height: 600px) and (orientation: landscape) {
-    .container { max-width: 90%; }
-    .sector-with-background { width: 160px; height: 160px; }
-    .time-display-overlay { font-size: 1rem; }
+@media (max-width: 380px) {
+  .header-top { gap: 5px; }
+  .header-top .burger-btn { flex-basis: 36px; }
+  .header-top .logo-container { flex-basis: 40px; width: 40px; height: 40px; }
+  .header-controls { padding: 5px; }
+  .header-controls .btn { font-size: 0.74rem; }
+  .header-controls .cycle-display { flex-basis: 38px; }
 }
