@@ -29,7 +29,6 @@ let deviceMotionHandler = null;
 
 // Éléments DOM
 const timeDisplay = document.getElementById('timeDisplay');
-const progressBar = document.getElementById('progressBar');
 const cycleCountCenter = document.getElementById('cycleCountCenter');
 const prepaSlider = document.getElementById('secondes_prepa');
 const prepaValue = document.getElementById('secondesPrepaValue');
@@ -162,15 +161,6 @@ function updateDisplay() {
             timeDisplay.textContent = `${currentWork}`;
         }
     }
-
-    let elapsed = 0, totalSegment = 0;
-    if (phase === 'prepa') { totalSegment = prepaSeconds; elapsed = prepaSeconds - currentPrepa; }
-    else if (phase === 'work') {
-        if (currentMode === 'chrono') { totalSegment = workSeconds; elapsed = workSeconds - currentWork; }
-        else { totalSegment = workRepsTarget; elapsed = workRepsTarget - currentWork; }
-    }
-    let percent = (totalSegment > 0) ? (elapsed / totalSegment) * 100 : 0;
-    progressBar.style.width = `${Math.min(100,percent)}%`;
     cycleCountCenter.textContent = (currentMode === 'compteur') ? Math.max(0, currentWork) : cycles;
     cycleDisplay.classList.toggle('counter-remaining', currentMode === 'compteur');
     updateCircularTimer();
